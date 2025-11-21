@@ -12,4 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MessengerZ" />
 
+        <!-- XPOSED METADATA START -->
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+
+        <meta-data
+            android:name="xposeddescription"
+            android:value="Static Mod for Messenger" />
+
+        <meta-data
+            android:name="xposedminversion"
+            android:value="54" />
+        <!-- XPOSED METADATA END -->
 </manifest>
