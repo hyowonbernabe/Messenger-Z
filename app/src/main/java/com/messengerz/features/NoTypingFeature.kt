@@ -37,7 +37,7 @@ object NoTypingFeature {
 
                     if (Preferences.isNoTypingEnabled) {
                         Log.d(TAG, ">>> BLOCKED TYPING INDICATOR (ID: $TYPING_ID_SDK) <<<")
-                        param.result = null // Stop it
+                        param.result = null
                     }
                 }
             }

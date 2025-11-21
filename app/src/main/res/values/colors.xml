@@ -7,4 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="mz_accent_red">#FF3B30</color>
+    <color name="mz_accent_red_dim">#4DFF3B30</color>
+    <color name="mz_background">#1E1E1E</color>
+    <color name="mz_text_primary">#FFFFFF</color>
+    <color name="mz_text_secondary">#B0B3B8</color>
+    <color name="mz_divider">#3E4042</color>
+    <color name="mz_switch_thumb_off">#B0B0B0</color>
+    <color name="mz_switch_track_off">#505050</color>
 </resources>
