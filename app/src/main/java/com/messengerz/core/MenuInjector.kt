@@ -1,108 +1,60 @@
 package com.messengerz.core
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import com.messengerz.ui.SettingsDialog
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import android.util.Log
-import java.util.WeakHashMap
 
 object MenuInjector {
     private const val TAG = "MessengerZ-Menu"
 
-    private val hookedActivities = WeakHashMap<Activity, Boolean>()
-
     fun init(lpparam: XC_LoadPackage.LoadPackageParam) {
         try {
-            Log.d(TAG, "Initializing MenuInjector...")
+            Log.d(TAG, "Initializing Instant Hook...")
 
             XposedHelpers.findAndHookMethod(
-                android.app.Activity::class.java,
-                "onWindowFocusChanged",
-                Boolean::class.javaPrimitiveType,
+                android.view.View::class.java,
+                "setContentDescription",
+                CharSequence::class.java,
                 object : XC_MethodHook() {
                     override fun afterHookedMethod(param: MethodHookParam) {
-                        val hasFocus = param.args[0] as Boolean
-                        val activity = param.thisObject as Activity
+                        val desc = param.args[0]?.toString() ?: return
+                        val view = param.thisObject as View
 
-                        if (activity.javaClass.name != "com.facebook.messenger.neue.MainActivity") {
-                            return
+                        if (desc.equals("Messenger", ignoreCase = true)) {
+                            attachListener(view, "Header")
                         }
 
-                        if (hasFocus && !hookedActivities.containsKey(activity)) {
-                            Log.d(TAG, "New MainActivity instance detected. Starting crawler...")
-
-                            hookedActivities[activity] = true
-
-                            Preferences.init(activity)
-                            startCrawler(activity)
+                        else if (desc.equals("Chats", ignoreCase = true) || desc.startsWith("Chats,", ignoreCase = true)) {
+                            attachListener(view, "Tab")
                         }
                     }
                 }
             )
+
         } catch (e: Throwable) {
             Log.e(TAG, "Error in MenuInjector", e)
         }
     }
 
-    private fun startCrawler(activity: Activity) {
-        val rootView = activity.window.decorView as ViewGroup
+    private fun attachListener(view: View, type: String) {
+        if (view.hasOnClickListeners()) {}
 
-        rootView.postDelayed({
+        view.setOnLongClickListener { v ->
+            Log.d(TAG, "$type Long Press Triggered")
             try {
-                val found = traverseAndHook(activity, rootView)
-                if (found) {
-                    Log.d(TAG, "SUCCESS: Header hooked.")
-                    Toast.makeText(activity, "Messenger Z Active", Toast.LENGTH_SHORT).show()
-                } else {
-                    Log.e(TAG, "FAILURE: Header not found. Retrying in 2s...")
-                    rootView.postDelayed({
-                        if (traverseAndHook(activity, rootView)) {
-                            Log.d(TAG, "SUCCESS: Header hooked on retry.")
-                        }
-                    }, 2000)
-                }
+                Preferences.init(v.context)
+
+                // Show Dialog
+                SettingsDialog.show(v.context)
             } catch (e: Exception) {
-                Log.e(TAG, "Crawler error", e)
+                Log.e(TAG, "Failed to open settings", e)
+                Toast.makeText(v.context, "Error opening menu", Toast.LENGTH_SHORT).show()
             }
-        }, 3000)
-    }
-
-    private fun traverseAndHook(context: Context, view: View): Boolean {
-        val desc = view.contentDescription?.toString()
-
-        if (desc != null && desc.equals("Messenger", ignoreCase = true)) {
-            Log.w(TAG, ">>> FOUND HEADER: '$desc' <<<")
-
-            view.setOnLongClickListener(null)
-
-            view.setOnLongClickListener {
-                Log.d(TAG, "HEADER Long Press Triggered!")
-                try {
-                    SettingsDialog.show(context)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to open dialog", e)
-                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-                }
-                true
-            }
-            return true
+            true
         }
-
-        if (view is ViewGroup) {
-            for (i in 0 until view.childCount) {
-                val child = view.getChildAt(i)
-                if (traverseAndHook(context, child)) {
-                    return true
-                }
-            }
-        }
-        return false
     }
 }

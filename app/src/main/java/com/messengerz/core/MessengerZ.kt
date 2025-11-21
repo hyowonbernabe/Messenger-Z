@@ -9,7 +9,7 @@ class MessengerZ : IXposedHookLoadPackage {
         if (lpparam.packageName != "com.facebook.orca") return
         if (lpparam.processName != "com.facebook.orca") return
 
-        Log.d("MessengerZ", "Initializing v1.0.0")
+        Log.d("MessengerZ", "v1.2.0")
 
         FeatureManager.init(lpparam)
 

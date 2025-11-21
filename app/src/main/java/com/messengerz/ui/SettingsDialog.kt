@@ -58,7 +58,7 @@ object SettingsDialog {
         mainLayout.addView(title)
 
         val subtitle = TextView(context)
-        subtitle.text = "v1.1.0"
+        subtitle.text = "v1.2.0"
         subtitle.textSize = 13f
         subtitle.setTextColor(COLOR_ACCENT)
         subtitle.gravity = Gravity.CENTER
