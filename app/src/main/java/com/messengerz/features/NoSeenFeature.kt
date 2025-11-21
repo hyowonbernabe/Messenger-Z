@@ -10,41 +10,39 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 object NoSeenFeature {
     private const val TAG = "MessengerZ"
 
-    private val BLOCK_IDS = listOf(81)
+    private const val BLOCK_ID = 81
 
     fun init(lpparam: XC_LoadPackage.LoadPackageParam) {
         try {
-            Log.d(TAG, "Initializing SDK Blocker (Target: ID 81)...")
-
             val sdkClass = XposedHelpers.findClassIfExists("com.facebook.sdk.mca.MailboxSDKJNI", lpparam.classLoader)
-            if (sdkClass != null) {
-                hookMethod(sdkClass, "SDK", "dispatchVOOOO")
 
-                hookMethod(sdkClass, "SDK", "dispatchVOOOOOZ")
+            if (sdkClass == null) {
+                Log.e(TAG, "Error: MailboxSDKJNI class not found.")
+                return
+            }
+
+            val targetMethod = sdkClass.declaredMethods.firstOrNull { it.name == "dispatchVOOOO" }
+
+            if (targetMethod != null) {
+                XposedBridge.hookMethod(targetMethod, object : XC_MethodHook() {
+                    override fun beforeHookedMethod(param: MethodHookParam) {
+                        val cmdId = param.args.getOrNull(0) as? Int ?: return
+
+                        if (cmdId == BLOCK_ID) {
+                            if (Preferences.isNoSeenEnabled) {
+                                Log.d(TAG, ">>> BLOCKED SEEN INDICATOR (ID: $BLOCK_ID) <<<")
+                                param.result = null
+                            }
+                        }
+                    }
+                })
+                Log.d(TAG, "NoSeenFeature: Hooked successfully.")
             } else {
-                Log.e(TAG, "MailboxSDKJNI not found")
+                Log.e(TAG, "Error: dispatchVOOOO method not found.")
             }
 
         } catch (e: Throwable) {
-            Log.e(TAG, "Error", e)
+            Log.e(TAG, "Error initializing NoSeenFeature", e)
         }
-    }
-
-    private fun hookMethod(clazz: Class<*>, type: String, methodName: String) {
-        val method = clazz.declaredMethods.firstOrNull { it.name == methodName } ?: return
-
-        XposedBridge.hookMethod(method, object : XC_MethodHook() {
-            override fun beforeHookedMethod(param: MethodHookParam) {
-                val cmdId = param.args.getOrNull(0) as? Int ?: return
-
-                if (cmdId in BLOCK_IDS) {
-                    Log.w(TAG, ">>> BLOCKED SDK READ RECEIPT (ID: $cmdId) <<<")
-
-                    if (Preferences.isNoSeenEnabled) {
-                        param.result = null
-                    }
-                }
-            }
-        })
     }
 }

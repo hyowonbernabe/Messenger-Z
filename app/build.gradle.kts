@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.messengerz"
+    namespace = "com.messengerz"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.messengerz"
+        applicationId = "com.messengerz"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -40,10 +40,12 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.preference.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
     // Added
     compileOnly(files("libs/api-82.jar"))
+    runtimeOnly(libs.androidx.preference.ktx)
 }

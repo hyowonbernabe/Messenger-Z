@@ -1,25 +1,25 @@
 package com.messengerz.core
 
-import de.robv.android.xposed.XSharedPreferences
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 
 object Preferences {
-    // We use the package name of OUR module, not Messenger
-    private const val MODULE_PACKAGE = "com.messengerz"
-    private var prefs: XSharedPreferences? = null
+    private var prefs: SharedPreferences? = null
 
-    fun init() {
+    fun init(context: Context) {
         if (prefs == null) {
-            prefs = XSharedPreferences(MODULE_PACKAGE, "MessengerZ_Prefs")
-            prefs?.makeWorldReadable()
-        } else {
-            prefs?.reload()
+            prefs = PreferenceManager.getDefaultSharedPreferences(context)
         }
     }
 
     val isNoSeenEnabled: Boolean
         get() {
-            // prefs?.reload()
-            // return prefs?.getBoolean("pref_no_seen", false) ?: false
-            return true // FORCE ON FOR TESTING
+            if (prefs == null) return true
+            return prefs?.getBoolean("pref_no_seen", true) ?: true
         }
+
+    fun setNoSeenEnabled(enabled: Boolean) {
+        prefs?.edit()?.putBoolean("pref_no_seen", enabled)?.apply()
+    }
 }
