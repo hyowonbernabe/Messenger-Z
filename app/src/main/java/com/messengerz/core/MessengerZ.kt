@@ -1,6 +1,7 @@
 package com.messengerz.core
 
 import android.util.Log
+import com.messengerz.global.Global
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
@@ -9,7 +10,7 @@ class MessengerZ : IXposedHookLoadPackage {
         if (lpparam.packageName != "com.facebook.orca") return
         if (lpparam.processName != "com.facebook.orca") return
 
-        Log.d("MessengerZ", "v1.2.0")
+        Log.d("MessengerZ", Global.VERSION)
 
         FeatureManager.init(lpparam)
 

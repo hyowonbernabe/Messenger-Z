@@ -18,6 +18,7 @@ import android.widget.ScrollView
 import android.widget.Switch
 import android.widget.TextView
 import com.messengerz.core.Preferences
+import com.messengerz.global.Global
 
 object SettingsDialog {
     private const val COLOR_BG = 0xFF1E1E1E.toInt()
@@ -58,7 +59,7 @@ object SettingsDialog {
         mainLayout.addView(title)
 
         val subtitle = TextView(context)
-        subtitle.text = "v1.2.0"
+        subtitle.text = Global.VERSION
         subtitle.textSize = 13f
         subtitle.setTextColor(COLOR_ACCENT)
         subtitle.gravity = Gravity.CENTER
