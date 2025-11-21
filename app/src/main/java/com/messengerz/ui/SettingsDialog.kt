@@ -2,10 +2,10 @@ package com.messengerz.ui
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Color
 import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
-import android.graphics.Color
 import com.messengerz.core.Preferences
 
 object SettingsDialog {
@@ -19,26 +19,45 @@ object SettingsDialog {
         layout.orientation = LinearLayout.VERTICAL
         layout.setPadding(50, 30, 50, 30)
 
-        // Switch: No Seen
+        // --- FEATURE 1: NO SEEN ---
         val noSeenSwitch = Switch(context)
         noSeenSwitch.text = "Disable Seen Indicator"
         noSeenSwitch.textSize = 16f
         noSeenSwitch.isChecked = Preferences.isNoSeenEnabled
-        noSeenSwitch.setPadding(0, 20, 0, 20)
+        noSeenSwitch.setPadding(0, 20, 0, 10)
 
         noSeenSwitch.setOnCheckedChangeListener { _, isChecked ->
             Preferences.setNoSeenEnabled(isChecked)
         }
 
-        // Description
-        val desc = TextView(context)
-        desc.text = "Prevents others from knowing you read their messages."
-        desc.textSize = 12f
-        desc.setTextColor(Color.GRAY)
-        desc.setPadding(0, 0, 0, 30)
+        val descSeen = TextView(context)
+        descSeen.text = "Prevents others from knowing you read their messages."
+        descSeen.textSize = 12f
+        descSeen.setTextColor(Color.GRAY)
+        descSeen.setPadding(0, 0, 0, 30)
 
+        // --- FEATURE 2: NO TYPING ---
+        val noTypingSwitch = Switch(context)
+        noTypingSwitch.text = "Disable Typing Indicator"
+        noTypingSwitch.textSize = 16f
+        noTypingSwitch.isChecked = Preferences.isNoTypingEnabled
+        noTypingSwitch.setPadding(0, 20, 0, 10)
+
+        noTypingSwitch.setOnCheckedChangeListener { _, isChecked ->
+            Preferences.setNoTypingEnabled(isChecked)
+        }
+
+        val descTyping = TextView(context)
+        descTyping.text = "Prevents others from seeing the typing animation."
+        descTyping.textSize = 12f
+        descTyping.setTextColor(Color.GRAY)
+        descTyping.setPadding(0, 0, 0, 30)
+
+        // Add views to layout
         layout.addView(noSeenSwitch)
-        layout.addView(desc)
+        layout.addView(descSeen)
+        layout.addView(noTypingSwitch)
+        layout.addView(descTyping)
 
         builder.setView(layout)
         builder.setPositiveButton("Close", null)

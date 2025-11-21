@@ -9,7 +9,7 @@ class MessengerZ : IXposedHookLoadPackage {
         if (lpparam.packageName != "com.facebook.orca") return
         if (lpparam.processName != "com.facebook.orca") return
 
-        Log.d("MessengerZ", "Initializing... hold chat 7")
+        Log.d("MessengerZ", "Initializing... 9")
 
         FeatureManager.init(lpparam)
 
