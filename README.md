@@ -28,9 +28,6 @@ Unlike older mods, Messenger Z supports the new **End-to-End Encrypted (E2EE)** 
 
 ## 📥 Installation
 
-There are two ways to install Messenger Z.
-
-### Method 1: The "Clean" Install (Easiest)
 1.  Uninstall the official Messenger app.
 2.  Download the **Patched Messenger Z APK** (from Releases).
 3.  Install it.
