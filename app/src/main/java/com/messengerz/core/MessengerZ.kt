@@ -12,8 +12,8 @@ class MessengerZ : IXposedHookLoadPackage {
 
         Log.d("MessengerZ", Global.VERSION)
 
+        ContextInjector.init(lpparam)
         FeatureManager.init(lpparam)
-
         MenuInjector.init(lpparam)
     }
 }

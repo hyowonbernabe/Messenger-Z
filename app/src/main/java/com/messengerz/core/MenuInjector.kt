@@ -27,10 +27,6 @@ object MenuInjector {
                         if (desc.equals("Messenger", ignoreCase = true)) {
                             attachListener(view, "Header")
                         }
-
-                        else if (desc.equals("Chats", ignoreCase = true) || desc.startsWith("Chats,", ignoreCase = true)) {
-                            attachListener(view, "Tab")
-                        }
                     }
                 }
             )

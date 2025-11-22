@@ -51,7 +51,7 @@ object SettingsDialog {
 
         // --- Header ---
         val title = TextView(context)
-        title.text = "Messenger Z"
+        title.text = Global.MESSENGER_Z_TITLE
         title.textSize = 22f
         title.setTypeface(null, Typeface.BOLD)
         title.setTextColor(COLOR_TEXT_PRIMARY)
@@ -70,8 +70,8 @@ object SettingsDialog {
 
         // Seen
         addSwitchRow(context, mainLayout,
-            "Disable Seen Indicator",
-            "Read messages without alerting the sender.",
+            Global.NO_SEEN_FEATURE_TITLE,
+            Global.NO_SEEN_FEATURE_DESC,
             Preferences.isNoSeenEnabled
         ) { isChecked -> Preferences.setNoSeenEnabled(isChecked) }
 
@@ -79,10 +79,21 @@ object SettingsDialog {
 
         // Typing
         addSwitchRow(context, mainLayout,
-            "Disable Typing Indicator",
-            "Hide the typing animation while you write.",
+            Global.NO_TYPING_FEATURE_TITLE,
+            Global.NO_TYPING_FEATURE_DESC,
             Preferences.isNoTypingEnabled
         ) { isChecked -> Preferences.setNoTypingEnabled(isChecked) }
+
+        addSpacer(context, mainLayout)
+
+        // Spoof Version
+        addSwitchRow(context, mainLayout,
+            Global.SPOOF_VERSION_FEATURE_TITLE,
+            Global.SPOOF_VERSION_FEATURE_DESC,
+            Preferences.isSpoofVersionEnabled
+        ) { isChecked ->
+            Preferences.setSpoofVersionEnabled(isChecked)
+        }
 
         // Divider
         val divider = View(context)
@@ -95,21 +106,23 @@ object SettingsDialog {
 
         // Credits
         val author = TextView(context)
-        author.text = "Created by Hyowon Bernabe"
+        author.text = Global.MESSENGER_Z_AUTHOR
         author.textSize = 13f
         author.setTextColor(COLOR_TEXT_SECONDARY)
         author.gravity = Gravity.CENTER
         mainLayout.addView(author)
 
         val github = TextView(context)
-        github.text = "github.com/hyowonbernabe/Messenger-Z"
+        github.text = Global.MESSENGER_Z_GITHUB
         github.textSize = 13f
         github.setTextColor(COLOR_ACCENT)
         github.gravity = Gravity.CENTER
         github.setPadding(0, dp(context, 4), 0, dp(context, 20))
+
         github.setOnClickListener {
             try {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/hyowonbernabe/Messenger-Z/"))
+                // Use Uri.parse directly for max compatibility
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(Global.MESSENGER_Z_GITHUB))
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
             } catch (e: Exception) {}
@@ -177,10 +190,7 @@ object SettingsDialog {
                 intArrayOf(android.R.attr.state_checked),
                 intArrayOf(-android.R.attr.state_checked)
             ),
-            intArrayOf(
-                COLOR_ACCENT,
-                COLOR_SWITCH_OFF
-            )
+            intArrayOf(COLOR_ACCENT, COLOR_SWITCH_OFF)
         )
         switchView.thumbTintList = thumbStates
 
@@ -189,10 +199,7 @@ object SettingsDialog {
                 intArrayOf(android.R.attr.state_checked),
                 intArrayOf(-android.R.attr.state_checked)
             ),
-            intArrayOf(
-                COLOR_ACCENT_DIM,
-                COLOR_TRACK_OFF
-            )
+            intArrayOf(COLOR_ACCENT_DIM, COLOR_TRACK_OFF)
         )
         switchView.trackTintList = trackStates
 

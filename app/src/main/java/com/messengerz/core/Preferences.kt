@@ -15,10 +15,7 @@ object Preferences {
 
     // --- SEEN ---
     val isNoSeenEnabled: Boolean
-        get() {
-            if (prefs == null) return true
-            return prefs?.getBoolean("pref_no_seen", true) ?: true
-        }
+        get() = prefs?.getBoolean("pref_no_seen", true) ?: true
 
     fun setNoSeenEnabled(enabled: Boolean) {
         prefs?.edit()?.putBoolean("pref_no_seen", enabled)?.apply()
@@ -26,12 +23,17 @@ object Preferences {
 
     // --- TYPING ---
     val isNoTypingEnabled: Boolean
-        get() {
-            if (prefs == null) return true
-            return prefs?.getBoolean("pref_no_typing", true) ?: true
-        }
+        get() = prefs?.getBoolean("pref_no_typing", true) ?: true
 
     fun setNoTypingEnabled(enabled: Boolean) {
         prefs?.edit()?.putBoolean("pref_no_typing", enabled)?.apply()
+    }
+
+    // --- SPOOF VERSION ---
+    val isSpoofVersionEnabled: Boolean
+        get() = prefs?.getBoolean("pref_spoof_version", false) ?: false
+
+    fun setSpoofVersionEnabled(enabled: Boolean) {
+        prefs?.edit()?.putBoolean("pref_spoof_version", enabled)?.apply()
     }
 }
