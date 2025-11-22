@@ -6,6 +6,10 @@
 
 Unlike older mods, Messenger Z supports the new **End-to-End Encrypted (E2EE)** architecture (ACT/TAM) used by modern Messenger versions.
 
+<p align="center">
+  <img src="screenshots/features.png" alt="Messenger Z Interface" width="25%">
+</p>
+
 ---
 
 ## ⚡ Features
@@ -14,7 +18,6 @@ Unlike older mods, Messenger Z supports the new **End-to-End Encrypted (E2EE)** 
     *   Supports Standard chats (`Core`).
     *   Supports Secret/Encrypted chats (`ACT` / `Shim`).
 *   **⌨️ No Typing:** Disable the "..." typing animation while you write.
-*   **🛠️ Version Spoofing:** Fixes the *"Your version of Messenger doesn't support this"* error by spoofing the internal version code to bypass server-side checks.
 *   **🎨 Native UI:**
     *   Integrated Settings Menu (Long-press the "Messenger" header).
     *   Dark Mode compatible with a modern Red Accent design.
@@ -25,9 +28,6 @@ Unlike older mods, Messenger Z supports the new **End-to-End Encrypted (E2EE)** 
 
 ## 📥 Installation
 
-There are two ways to install Messenger Z.
-
-### Method 1: The "Clean" Install (Easiest)
 1.  Uninstall the official Messenger app.
 2.  Download the **Patched Messenger Z APK** (from Releases).
 3.  Install it.
