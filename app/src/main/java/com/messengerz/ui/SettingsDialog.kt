@@ -8,7 +8,6 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
-import android.net.Uri
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -17,6 +16,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.Switch
 import android.widget.TextView
+import androidx.core.net.toUri
 import com.messengerz.core.Preferences
 import com.messengerz.global.Global
 
@@ -91,9 +91,46 @@ object SettingsDialog {
             Global.SPOOF_VERSION_FEATURE_TITLE,
             Global.SPOOF_VERSION_FEATURE_DESC,
             Preferences.isSpoofVersionEnabled
-        ) { isChecked ->
-            Preferences.setSpoofVersionEnabled(isChecked)
+        ) { isChecked -> Preferences.setSpoofVersionEnabled(isChecked) }
+
+        addSpacer(context, mainLayout)
+
+        // Message Logger Logic
+
+        val btnLogs = Button(context)
+        btnLogs.text = "View Message Logs"
+        btnLogs.setTextColor(COLOR_TEXT_PRIMARY)
+        btnLogs.textSize = 14f
+        btnLogs.setTypeface(null, Typeface.BOLD)
+
+        val btnBg = GradientDrawable()
+        btnBg.setColor(COLOR_DIVIDER) // Distinct color for secondary action
+        btnBg.cornerRadius = dp(context, 50).toFloat()
+        btnLogs.background = btnBg
+
+        val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        params.setMargins(0, dp(context, 12), 0, 0)
+        btnLogs.layoutParams = params
+
+        btnLogs.visibility = if (Preferences.isMessageLoggerEnabled) View.VISIBLE else View.GONE
+
+        btnLogs.setOnClickListener {
+            MessageLogDialog.show(context)
         }
+
+        addSwitchRow(context, mainLayout,
+            Global.MESSAGE_LOG_FEATURE_TITLE,
+            Global.MESSAGE_LOG_FEATURE_DESC,
+            Preferences.isMessageLoggerEnabled
+        ) { isChecked ->
+            Preferences.setMessageLoggerEnabled(isChecked)
+            btnLogs.visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
+
+        mainLayout.addView(btnLogs)
+
+
+        // --- Footer ---
 
         // Divider
         val divider = View(context)
@@ -118,10 +155,9 @@ object SettingsDialog {
         github.setTextColor(COLOR_ACCENT)
         github.gravity = Gravity.CENTER
         github.setPadding(0, dp(context, 4), 0, dp(context, 20))
-
         github.setOnClickListener {
             try {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(Global.MESSENGER_Z_GITHUB))
+                val intent = Intent(Intent.ACTION_VIEW, Global.MESSENGER_Z_GITHUB.toUri())
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
             } catch (e: Exception) {}
@@ -135,10 +171,10 @@ object SettingsDialog {
         btnClose.textSize = 14f
         btnClose.setTypeface(null, Typeface.BOLD)
 
-        val btnBg = GradientDrawable()
-        btnBg.setColor(COLOR_ACCENT)
-        btnBg.cornerRadius = dp(context, 50).toFloat()
-        btnClose.background = btnBg
+        val closeBg = GradientDrawable()
+        closeBg.setColor(COLOR_ACCENT)
+        closeBg.cornerRadius = dp(context, 50).toFloat()
+        btnClose.background = closeBg
 
         btnClose.setOnClickListener { dialog.dismiss() }
         mainLayout.addView(btnClose)
@@ -189,7 +225,10 @@ object SettingsDialog {
                 intArrayOf(android.R.attr.state_checked),
                 intArrayOf(-android.R.attr.state_checked)
             ),
-            intArrayOf(COLOR_ACCENT, COLOR_SWITCH_OFF)
+            intArrayOf(
+                COLOR_ACCENT,
+                COLOR_SWITCH_OFF
+            )
         )
         switchView.thumbTintList = thumbStates
 
@@ -198,7 +237,10 @@ object SettingsDialog {
                 intArrayOf(android.R.attr.state_checked),
                 intArrayOf(-android.R.attr.state_checked)
             ),
-            intArrayOf(COLOR_ACCENT_DIM, COLOR_TRACK_OFF)
+            intArrayOf(
+                COLOR_ACCENT_DIM,
+                COLOR_TRACK_OFF
+            )
         )
         switchView.trackTintList = trackStates
 

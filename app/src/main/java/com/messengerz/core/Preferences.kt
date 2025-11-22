@@ -36,4 +36,12 @@ object Preferences {
     fun setSpoofVersionEnabled(enabled: Boolean) {
         prefs?.edit()?.putBoolean("pref_spoof_version", enabled)?.apply()
     }
+
+    // --- MESSAGE LOGGER ---
+    val isMessageLoggerEnabled: Boolean
+        get() = prefs?.getBoolean("pref_msg_logger", false) ?: false
+
+    fun setMessageLoggerEnabled(enabled: Boolean) {
+        prefs?.edit()?.putBoolean("pref_msg_logger", enabled)?.apply()
+    }
 }

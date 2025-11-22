@@ -19,7 +19,11 @@ object ContextInjector {
                         val context = param.args[0] as Context
 
                         Preferences.init(context)
-                        Log.d("MessengerZ", "Preferences initialized via ContextInjector.")
+
+                        // Pass context to Logger explicitly
+                        com.messengerz.features.MessageLoggerFeature.setContext(context)
+
+                        Log.d("MessengerZ", "Context injected into Prefs and Logger.")
                     }
                 }
             )
