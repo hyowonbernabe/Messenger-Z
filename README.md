@@ -6,6 +6,10 @@
 
 Unlike older mods, Messenger Z supports the new **End-to-End Encrypted (E2EE)** architecture (ACT/TAM) used by modern Messenger versions.
 
+<p align="center">
+  <img src="screenshots/features.png" alt="Messenger Z Interface" width="25%">
+</p>
+
 ---
 
 ## ⚡ Features
