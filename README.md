@@ -18,7 +18,6 @@ Unlike older mods, Messenger Z supports the new **End-to-End Encrypted (E2EE)** 
     *   Supports Standard chats (`Core`).
     *   Supports Secret/Encrypted chats (`ACT` / `Shim`).
 *   **⌨️ No Typing:** Disable the "..." typing animation while you write.
-*   **🛠️ Version Spoofing:** Fixes the *"Your version of Messenger doesn't support this"* error by spoofing the internal version code to bypass server-side checks.
 *   **🎨 Native UI:**
     *   Integrated Settings Menu (Long-press the "Messenger" header).
     *   Dark Mode compatible with a modern Red Accent design.
