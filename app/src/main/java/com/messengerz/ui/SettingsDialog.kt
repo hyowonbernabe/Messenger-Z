@@ -121,7 +121,6 @@ object SettingsDialog {
 
         github.setOnClickListener {
             try {
-                // Use Uri.parse directly for max compatibility
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(Global.MESSENGER_Z_GITHUB))
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
