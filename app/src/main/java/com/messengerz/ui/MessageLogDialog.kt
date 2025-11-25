@@ -47,16 +47,14 @@ object MessageLogDialog {
             val pad = dp(context, 20)
             mainLayout.setPadding(pad, pad, pad, pad)
 
-            // Background
             val bgShape = GradientDrawable()
             bgShape.color = android.content.res.ColorStateList.valueOf(COLOR_BG)
             bgShape.cornerRadius = dp(context, 20).toFloat()
             bgShape.setStroke(dp(context, 2), COLOR_ACCENT)
             mainLayout.background = bgShape
 
-            // Title
             val title = TextView(context)
-            title.text = Global.MESSAGE_LOG_FEATURE_TITLE
+            title.text = "Deleted Messages"
             title.textSize = 20f
             title.setTypeface(null, Typeface.BOLD)
             title.setTextColor(COLOR_TEXT_PRIMARY)
@@ -64,7 +62,8 @@ object MessageLogDialog {
             title.setPadding(0, 0, 0, dp(context, 20))
             mainLayout.addView(title)
 
-            val messages = db.getAllMessagesDebug()
+            // FETCH ONLY DELETED MESSAGES
+            val messages = db.getDeletedMessages()
 
             if (messages.isEmpty()) {
                 val emptyView = TextView(context)
@@ -86,7 +85,6 @@ object MessageLogDialog {
                     mainLayout.addView(div)
                 }
 
-                // Clear All Button
                 val btnClear = Button(context)
                 btnClear.text = Global.MESSAGE_LOG_FEATURE_CLEAR
                 btnClear.setTextColor(COLOR_TEXT_PRIMARY)
@@ -104,7 +102,7 @@ object MessageLogDialog {
                 btnClear.setOnClickListener {
                     AlertDialog.Builder(context)
                         .setTitle("Clear All?")
-                        .setMessage("This will delete all saved messages.")
+                        .setMessage("This will delete all saved logs.")
                         .setPositiveButton("Yes") { _, _ ->
                             db.clearAllMessages()
                             refreshList()
@@ -132,7 +130,6 @@ object MessageLogDialog {
         container.gravity = Gravity.CENTER_VERTICAL
         container.setPadding(0, dp(context, 12), 0, dp(context, 12))
 
-        // Text Layout
         val textLayout = LinearLayout(context)
         textLayout.orientation = LinearLayout.VERTICAL
         textLayout.layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
@@ -159,7 +156,6 @@ object MessageLogDialog {
         textLayout.addView(contentView)
         textLayout.addView(timeView)
 
-        // Delete Button
         val deleteBtn = TextView(context)
         deleteBtn.text = "✕"
         deleteBtn.textSize = 18f

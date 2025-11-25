@@ -98,7 +98,7 @@ object SettingsDialog {
         // Message Logger Logic
 
         val btnLogs = Button(context)
-        btnLogs.text = "View Message Logs"
+        btnLogs.text = "View Unsent Messages"
         btnLogs.setTextColor(COLOR_TEXT_PRIMARY)
         btnLogs.textSize = 14f
         btnLogs.setTypeface(null, Typeface.BOLD)

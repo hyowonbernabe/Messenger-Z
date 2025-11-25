@@ -3,7 +3,6 @@ package com.messengerz.features
 import android.app.AndroidAppHelper
 import android.content.Context
 import android.util.Log
-import com.messengerz.core.Preferences
 import com.messengerz.data.MessageDatabase
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
@@ -13,6 +12,10 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 object MessageLoggerFeature {
     private const val TAG = "MessengerZ-Logger"
     private var db: MessageDatabase? = null
+
+    // Deduplication Cache
+    private var lastMessageHash = ""
+    private var lastMessageTime = 0L
 
     fun setContext(context: Context) {
         if (db == null) {
@@ -50,7 +53,6 @@ object MessageLoggerFeature {
 
     private fun findMessageFields(notification: Any) {
         val fields = notification.javaClass.declaredFields
-
         var messageObj: Any? = null
         var threadSummaryObj: Any? = null
 
@@ -73,14 +75,14 @@ object MessageLoggerFeature {
     }
 
     private fun processMessage(message: Any, threadSummary: Any?) {
-        if (!Preferences.isMessageLoggerEnabled) return
-
         try {
             val fields = message.javaClass.declaredFields
 
             var content: String? = null
+            var senderName: String? = null
             var senderId: String? = null
             var threadKey: String = "unknown"
+            var realMsgId: String? = null
 
             for (field in fields) {
                 field.isAccessible = true
@@ -89,6 +91,7 @@ object MessageLoggerFeature {
                 if (value != null) {
                     val className = value.javaClass.name
 
+                    // 1. Content
                     if (className.contains("SecretString")) {
                         val extracted = extractSecret(value)
                         if (content == null && extracted != "[Secret]") {
@@ -96,19 +99,28 @@ object MessageLoggerFeature {
                         }
                     }
 
+                    // 2. Sender ID
                     if (className.contains("ParticipantInfo")) {
                         val participantStr = value.toString()
                         val match = Regex("FACEBOOK:(\\d+)").find(participantStr)
                         senderId = match?.groupValues?.get(1) ?: participantStr
                     }
 
+                    // 3. Thread Key
                     if (className.contains("ThreadKey")) {
                         threadKey = value.toString()
+                    }
+
+                    // 4. Real Message ID (A1X)
+                    if (field.name == "A1X" && value is String) {
+                        realMsgId = value
+                    } else if (value is String && value.length > 20 && !value.contains("FACEBOOK")) {
+                        if (realMsgId == null) realMsgId = value
                     }
                 }
             }
 
-            var senderName: String? = null
+            // 5. Name from ThreadSummary
             if (threadSummary != null) {
                 senderName = extractNameFromSummary(threadSummary)
             }
@@ -116,20 +128,30 @@ object MessageLoggerFeature {
             val finalSender = if (!senderName.isNullOrEmpty()) senderName else senderId
 
             if (content != null && finalSender != null) {
-                // Filter System Messages
+
+                // --- UNSEND DETECTION LOGIC ---
                 if (content.contains("sent a message") || content.contains("removed a message")) {
-                    return
+                    if (realMsgId != null) {
+                        Log.w(TAG, ">>> DETECTED UNSEND via Notification! ID: $realMsgId")
+                        db?.markAsDeleted(realMsgId)
+                    } else {
+                        Log.e(TAG, "Unsend detected but ID was null.")
+                    }
+                    return // Stop here. Do not save "sent a message" to DB.
                 }
 
-                Log.w(TAG, ">>> CAPTURED: '$content' from $finalSender")
-
+                // --- DEDUPLICATION ---
+                val currentHash = "$finalSender$content"
                 val now = System.currentTimeMillis()
+                if (currentHash == lastMessageHash && (now - lastMessageTime) < 2000) return
+                lastMessageHash = currentHash
+                lastMessageTime = now
 
-                // --- DEDUPLICATION KEY ---
-                val bucket = now / 5000
-                val uniqueId = "${content.hashCode()}_$bucket"
+                Log.w(TAG, ">>> CAPTURED: '$content' (ID: $realMsgId)")
 
-                db?.saveMessage(uniqueId, threadKey, finalSender, content, now)
+                val dbId = realMsgId ?: now.toString()
+
+                db?.saveMessage(dbId, threadKey, finalSender, content, now)
             }
 
         } catch (e: Throwable) {
@@ -143,9 +165,7 @@ object MessageLoggerFeature {
             for (f in fields) {
                 f.isAccessible = true
                 val v = f.get(secretStringObj) as? String ?: continue
-                if (v.isNotEmpty() && v != "null" && !v.all { it == '*' }) {
-                    return v
-                }
+                if (v.isNotEmpty() && v != "null" && !v.all { it == '*' }) return v
             }
         } catch (e: Throwable) {}
         return "[Secret]"
@@ -157,11 +177,9 @@ object MessageLoggerFeature {
             for (f in fields) {
                 f.isAccessible = true
                 val v = f.get(summary)
-
                 if (v is String && v.length > 1 && !v.all { it == '*' } && !v.contains("FACEBOOK")) {
                     if (v.any { it.isLetter() }) return v
                 }
-
                 if (v != null && v.javaClass.name.contains("SecretString")) {
                     val secret = extractSecret(v)
                     if (secret != "[Secret]") return secret

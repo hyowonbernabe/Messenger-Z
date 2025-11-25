@@ -27,18 +27,25 @@ class MessageDatabase(context: Context) : SQLiteOpenHelper(context, "MessengerZ_
                 put("sender_id", senderId ?: "unknown")
                 put("content", content)
                 put("timestamp", timestamp)
-                put("is_deleted", 0) // Always save as NOT deleted initially
+                put("is_deleted", 0)
             }
             db.insertWithOnConflict("messages", null, values, SQLiteDatabase.CONFLICT_REPLACE)
         } catch (e: Exception) {
-            Log.e("MessengerZ-DB", "Save error", e)
+            Log.e("MessengerZ-DB", "Save failed", e)
         }
     }
 
-    fun clearAllMessages() {
+    fun markAsDeleted(msgId: String) {
         try {
-            writableDatabase.delete("messages", null, null)
-        } catch (e: Exception) {}
+            val db = writableDatabase
+            val values = ContentValues().apply { put("is_deleted", 1) }
+            val count = db.update("messages", values, "msg_id = ?", arrayOf(msgId))
+            if (count > 0) {
+                Log.d("MessengerZ-DB", "Successfully marked $msgId as deleted")
+            }
+        } catch (e: Exception) {
+            Log.e("MessengerZ-DB", "Mark deleted failed", e)
+        }
     }
 
     fun deleteMessage(msgId: String) {
@@ -47,15 +54,45 @@ class MessageDatabase(context: Context) : SQLiteOpenHelper(context, "MessengerZ_
         } catch (e: Exception) {}
     }
 
+    fun clearAllMessages() {
+        try {
+            writableDatabase.delete("messages", null, null)
+        } catch (e: Exception) {}
+    }
+
     data class LogItem(val id: String, val senderId: String, val content: String, val timestamp: Long)
 
-    fun getAllMessagesDebug(): List<LogItem> {
+    fun getDeletedMessages(): List<LogItem> {
+        val list = ArrayList<LogItem>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT msg_id, sender_id, content, timestamp FROM messages WHERE is_deleted = 1 ORDER BY timestamp DESC", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                list.add(LogItem(
+                    cursor.getString(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getLong(3)
+                ))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
+
+    fun getAllMessages(): List<LogItem> {
         val list = ArrayList<LogItem>()
         val db = readableDatabase
         val cursor = db.rawQuery("SELECT msg_id, sender_id, content, timestamp FROM messages ORDER BY timestamp DESC", null)
         if (cursor.moveToFirst()) {
             do {
-                list.add(LogItem(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getLong(3)))
+                list.add(LogItem(
+                    cursor.getString(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getLong(3)
+                ))
             } while (cursor.moveToNext())
         }
         cursor.close()
