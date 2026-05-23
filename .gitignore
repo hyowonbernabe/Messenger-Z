@@ -13,3 +13,18 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Release artifacts (uploaded to GitHub Releases, not tracked in git tree)
+/dist/
+*.apk
+
+# Project-local tooling
+# Keep tools/ tree partially tracked: scripts + docs in, downloaded binaries out.
+/tools/**/*.jar
+/tools/**/*.zip
+/tools/work/
+/tools/api-82-extracted/
+/tools/lspatch-src/
+/tools/jadx-mcp/server/
+
+.mcp.json.local

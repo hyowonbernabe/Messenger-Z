@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "jadx-mcp-server": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "tools/jadx-mcp/server/jadx-mcp-server",
+        "run",
+        "jadx_mcp_server.py"
+      ]
+    }
+  }
+}
