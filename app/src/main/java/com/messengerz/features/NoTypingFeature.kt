@@ -10,7 +10,9 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 object NoTypingFeature {
     private const val TAG = "MessengerZ"
 
-    private const val TYPING_ID_SDK = 88
+    // MailboxSDKJNI.dispatchVOOOZ command id for "typing indicator".
+    // Drifts per Messenger version. v82=88, v562=90 (found via Debug Console).
+    private const val TYPING_ID_SDK = 90
 
     fun init(lpparam: XC_LoadPackage.LoadPackageParam) {
         try {

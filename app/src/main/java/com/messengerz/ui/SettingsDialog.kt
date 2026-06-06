@@ -129,6 +129,28 @@ object SettingsDialog {
 
         mainLayout.addView(btnLogs)
 
+        // --- Debug Console (signal finder) ---
+        val btnDebug = Button(context)
+        btnDebug.text = "Debug Console"
+        btnDebug.setTextColor(COLOR_TEXT_PRIMARY)
+        btnDebug.textSize = 14f
+        btnDebug.setTypeface(null, Typeface.BOLD)
+        btnDebug.isAllCaps = false
+        val debugBg = GradientDrawable()
+        debugBg.setColor(COLOR_DIVIDER)
+        debugBg.cornerRadius = dp(context, 50).toFloat()
+        btnDebug.background = debugBg
+        val debugParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        debugParams.setMargins(0, dp(context, 12), 0, 0)
+        btnDebug.layoutParams = debugParams
+        btnDebug.setOnClickListener {
+            dialog.dismiss()
+            DebugConsoleOverlay.show(context)
+        }
+        mainLayout.addView(btnDebug)
+
 
         // --- Footer ---
 

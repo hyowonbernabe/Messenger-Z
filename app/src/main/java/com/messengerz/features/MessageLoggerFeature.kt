@@ -3,6 +3,7 @@ package com.messengerz.features
 import android.app.AndroidAppHelper
 import android.content.Context
 import android.util.Log
+import com.messengerz.core.DebugLog
 import com.messengerz.data.MessageDatabase
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
@@ -69,6 +70,18 @@ object MessageLoggerFeature {
             }
         }
 
+        if (DebugLog.capturing) {
+            if (messageObj == null) {
+                val names = notification.javaClass.declaredFields.mapNotNull {
+                    it.isAccessible = true
+                    try { it.get(notification)?.javaClass?.name } catch (e: Throwable) { null }
+                }.joinToString(", ")
+                DebugLog.note("Logger: no Message field. Notif classes: ${names.take(240)}")
+            } else {
+                DebugLog.note("Logger: found Message (thread=${threadSummaryObj != null})")
+            }
+        }
+
         if (messageObj != null) {
             processMessage(messageObj, threadSummaryObj)
         }
@@ -131,6 +144,7 @@ object MessageLoggerFeature {
 
                 // --- UNSEND DETECTION LOGIC ---
                 if (content.contains("sent a message") || content.contains("removed a message")) {
+                    if (DebugLog.capturing) DebugLog.note("Logger UNSEND id=${realMsgId ?: "null"}")
                     if (realMsgId != null) {
                         Log.w(TAG, ">>> DETECTED UNSEND via Notification! ID: $realMsgId")
                         db?.markAsDeleted(realMsgId)
@@ -148,6 +162,7 @@ object MessageLoggerFeature {
                 lastMessageTime = now
 
                 Log.w(TAG, ">>> CAPTURED: '$content' (ID: $realMsgId)")
+                if (DebugLog.capturing) DebugLog.note("Logger CAPTURED from $finalSender: ${content.take(60)}")
 
                 val dbId = realMsgId ?: now.toString()
 

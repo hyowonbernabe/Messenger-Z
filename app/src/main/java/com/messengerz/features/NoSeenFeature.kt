@@ -10,7 +10,9 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 object NoSeenFeature {
     private const val TAG = "MessengerZ"
 
-    private const val BLOCK_ID = 81
+    // MailboxSDKJNI.dispatchVOOOO command id for "mark thread read / send seen".
+    // Meta shuffles this per Messenger version. v82=81, v562=83 (found via Debug Console).
+    private const val BLOCK_ID = 83
 
     fun init(lpparam: XC_LoadPackage.LoadPackageParam) {
         try {

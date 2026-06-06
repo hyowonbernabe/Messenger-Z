@@ -4,6 +4,7 @@ import com.messengerz.features.NoSeenFeature
 import com.messengerz.features.NoTypingFeature
 import com.messengerz.features.MessageLoggerFeature
 import com.messengerz.features.SpoofVersionFeature
+import com.messengerz.features.DispatchProbe
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 object FeatureManager {
@@ -12,5 +13,6 @@ object FeatureManager {
         NoTypingFeature.init(lpparam)
         SpoofVersionFeature.init(lpparam)
         MessageLoggerFeature.init(lpparam)
+        DispatchProbe.init(lpparam)
     }
 }
