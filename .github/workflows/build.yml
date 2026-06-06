@@ -1,0 +1,91 @@
+name: Build Messenger Z
+
+on:
+  schedule:
+    # ~biweekly: 1st and 15th of each month, 00:00 UTC
+    - cron: "0 0 1,15 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Make scripts executable
+        run: chmod +x ./gradlew tools/*.sh
+
+      - name: Determine latest Messenger version
+        id: ver
+        run: |
+          V=$(bash tools/fetch-messenger.sh version)
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "Latest stable Messenger: $V"
+
+      - name: Decide whether to build
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="${{ steps.ver.outputs.version }}"
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && gh release view "v$V" >/dev/null 2>&1; then
+            echo "build=false" >> "$GITHUB_OUTPUT"
+            echo "Release v$V already exists; nothing new to build."
+          else
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download stock Messenger
+        if: steps.gate.outputs.build == 'true'
+        run: bash tools/fetch-messenger.sh download messenger.apk
+
+      - name: Build Messenger Z module
+        if: steps.gate.outputs.build == 'true'
+        run: ./gradlew :app:assembleDebug --console=plain
+
+      - name: Patch (strip perms + sign + LSPatch embed)
+        if: steps.gate.outputs.build == 'true'
+        run: |
+          bash tools/build-ci.sh messenger.apk app/build/outputs/apk/debug/app-debug.apk dist
+          V="${{ steps.ver.outputs.version }}"
+          OUT=$(ls dist/*lspatched.apk | head -1)
+          cp "$OUT" "MessengerZ-$V.apk"
+          echo "Built MessengerZ-$V.apk"
+
+      - name: Publish prerelease
+        if: steps.gate.outputs.build == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="${{ steps.ver.outputs.version }}"
+          NOTES="Auto-built on Messenger ${V}.
+
+          **PRERELEASE — verify before promoting.** Install, open the Debug Console, confirm
+          No Seen (id 83) and No Typing (id 90) still fire, then edit this release and uncheck
+          *pre-release* to publish it for Obtainium. If a hook stopped working, the command id
+          drifted — re-capture it via the console (see docs/maintenance.md and docs/hook-ids.md)."
+          if gh release view "v$V" >/dev/null 2>&1; then
+            gh release upload "v$V" "MessengerZ-$V.apk" --clobber
+          else
+            gh release create "v$V" "MessengerZ-$V.apk" \
+              --title "Messenger Z v$V" \
+              --prerelease \
+              --notes "$NOTES"
+          fi
+
+      - name: Summary
+        if: steps.gate.outputs.build == 'true'
+        run: echo "Prerelease v${{ steps.ver.outputs.version }} published. Verify hooks, then un-mark prerelease to ship." >> "$GITHUB_STEP_SUMMARY"

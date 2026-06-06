@@ -21,6 +21,10 @@ local.properties
 # Project-local tooling
 # Keep tools/ tree partially tracked: scripts + docs in, downloaded binaries out.
 /tools/**/*.jar
+# ...except the pinned build-pipeline jars, which CI needs committed.
+!/tools/apkeditor.jar
+!/tools/uber-apk-signer.jar
+!/tools/lspatch/lspatch.jar
 /tools/**/*.zip
 /tools/work/
 /tools/api-82-extracted/
