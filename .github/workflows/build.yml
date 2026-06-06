@@ -55,9 +55,11 @@ jobs:
       - name: Build Messenger Z module
         if: steps.gate.outputs.build == 'true'
         env:
-          VER_CODE: ${{ 11000 + github.run_number }}
+          RUN_NUMBER: ${{ github.run_number }}
           MSGR_VER: ${{ steps.ver.outputs.version }}
-        run: ./gradlew :app:assembleDebug -PverCode="$VER_CODE" -PmsgrVer="$MSGR_VER" --console=plain
+        run: |
+          VER_CODE=$((11000 + RUN_NUMBER))
+          ./gradlew :app:assembleDebug -PverCode="$VER_CODE" -PmsgrVer="$MSGR_VER" --console=plain
 
       - name: Patch (strip perms + sign + LSPatch embed)
         if: steps.gate.outputs.build == 'true'
