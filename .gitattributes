@@ -1,0 +1,4 @@
+# Shell/python scripts and the gradle wrapper MUST stay LF so they run on Linux CI.
+*.sh    text eol=lf
+*.py    text eol=lf
+gradlew text eol=lf
