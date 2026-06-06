@@ -59,7 +59,7 @@ object SettingsDialog {
         mainLayout.addView(title)
 
         val subtitle = TextView(context)
-        subtitle.text = Global.VERSION
+        subtitle.text = "${Global.VERSION}  ·  Messenger ${com.messengerz.BuildConfig.MESSENGER_VER}"
         subtitle.textSize = 13f
         subtitle.setTextColor(COLOR_ACCENT)
         subtitle.gravity = Gravity.CENTER

@@ -54,7 +54,10 @@ jobs:
 
       - name: Build Messenger Z module
         if: steps.gate.outputs.build == 'true'
-        run: ./gradlew :app:assembleDebug --console=plain
+        env:
+          VER_CODE: ${{ 11000 + github.run_number }}
+          MSGR_VER: ${{ steps.ver.outputs.version }}
+        run: ./gradlew :app:assembleDebug -PverCode="$VER_CODE" -PmsgrVer="$MSGR_VER" --console=plain
 
       - name: Patch (strip perms + sign + LSPatch embed)
         if: steps.gate.outputs.build == 'true'
@@ -71,21 +74,31 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           V="${{ steps.ver.outputs.version }}"
-          NOTES="Auto-built on Messenger ${V}.
+          MODVER=$(grep -oE 'versionName = "[^"]*"' app/build.gradle.kts | grep -oE '[0-9][0-9.]*' | head -1)
+          NOTES="**Messenger Z ${MODVER}** — patched onto Messenger ${V}. Non-root; installs alongside the Facebook app.
 
-          **PRERELEASE — verify before promoting.** Install, open the Debug Console, confirm
-          No Seen (id 83) and No Typing (id 90) still fire, then edit this release and uncheck
-          *pre-release* to publish it for Obtainium. If a hook stopped working, the command id
-          drifted — re-capture it via the console (see docs/maintenance.md and docs/hook-ids.md)."
+          > ⚠️ **Pre-release.** This is an automated build that hasn't been manually checked yet. If Messenger changed internally since the last update, some features may not work until a fix ships. A confirmed-working build is published as the latest (non-pre-release) version.
+
+          **Features:** hide seen indicator, hide typing indicator, log unsent messages, version spoof.
+
+          Open settings by long-pressing the **Messenger** title."
           if gh release view "v$V" >/dev/null 2>&1; then
             gh release upload "v$V" "MessengerZ-$V.apk" --clobber
           else
             gh release create "v$V" "MessengerZ-$V.apk" \
-              --title "Messenger Z v$V" \
+              --title "Messenger Z ${MODVER} (Messenger ${V})" \
               --prerelease \
               --notes "$NOTES"
           fi
 
-      - name: Summary
+      - name: Maintainer reminder (internal, not shown to users)
         if: steps.gate.outputs.build == 'true'
-        run: echo "Prerelease v${{ steps.ver.outputs.version }} published. Verify hooks, then un-mark prerelease to ship." >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          {
+            echo "### Prerelease v${{ steps.ver.outputs.version }} published"
+            echo ""
+            echo "**Before promoting:** install, open the Debug Console, confirm No Seen and No Typing still fire."
+            echo "Expected command ids live in \`docs/hook-ids.md\`. If a hook is dead, the id drifted — re-capture via the console (see \`docs/maintenance.md\`), update the constant, and re-run."
+            echo ""
+            echo "Then edit the release and uncheck **pre-release** to ship it to Obtainium."
+          } >> "$GITHUB_STEP_SUMMARY"

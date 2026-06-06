@@ -11,10 +11,20 @@ android {
         applicationId = "com.messengerz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10800
-        versionName = "1.8.0"
+        // CI overrides versionCode via -PverCode (run-number based) so each build
+        // outranks the last and Obtainium/Android can update over it. Local builds use the default.
+        versionCode = (project.findProperty("verCode") as String?)?.toIntOrNull() ?: 10900
+        versionName = "1.9.0"
+
+        // Messenger base version this build is patched onto. CI passes -PmsgrVer=<version>;
+        // local builds show "dev". Lets the in-app version line auto-track the base.
+        buildConfigField("String", "MESSENGER_VER", "\"${(project.findProperty("msgrVer") as String?) ?: "dev"}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
