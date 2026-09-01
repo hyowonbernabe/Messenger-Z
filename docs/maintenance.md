@@ -82,12 +82,21 @@ so you do not have to decompile by hand.
 
 ### 4.1 Build a fresh patched APK
 
-1. Download the target Messenger APK (`com.facebook.orca`) from APKMirror and drop it at
-   the repo root. (Single-arch, e.g. `arm64-v8a`, is fine.)
+1. Fetch the target Messenger APK (`com.facebook.orca`) into the repo root:
+   ```
+   bash tools/fetch-messenger.sh version               # what's current upstream
+   bash tools/fetch-messenger.sh download com.facebook.orca_<version>.apk
+   ```
+   Source is APKPure (APKMirror is Cloudflare-blocked headless; uptodown is now behind
+   Turnstile). A hand-downloaded single-arch APK works too.
+   If more than one `*.apk` sits in the repo root, pass `-MessengerApk <path>` in step 3 —
+   the script's autodetect expects exactly one.
 2. Build the module:
    ```
    ./gradlew :app:assembleDebug
    ```
+   Use **JDK 21** (`tools/lspatch/lspatch.jar` rejects newer JDKs). The Android Studio JBR
+   at `…/Android Studio/jbr` is 21 — point `JAVA_HOME` at it.
 3. Run the full patch pipeline (strips the Facebook-conflicting permissions, re-signs,
    embeds the module via LSPatch — all headless, no phone):
    ```
@@ -179,7 +188,7 @@ that looks obfuscated, and record the id (with the Messenger version it was foun
 
 ## 8. Environment / prerequisites
 
-- JDK 17+ (the Android Studio JBR at `…/Android Studio/jbr` works).
+- JDK 21 (the Android Studio JBR at `…/Android Studio/jbr` is 21; lspatch.jar needs 21).
 - Android SDK (`local.properties` → `sdk.dir`).
 - `tools/` jars: `apkeditor.jar`, `uber-apk-signer.jar`, `lspatch/lspatch.jar` (gitignored;
   re-download if missing).

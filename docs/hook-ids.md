@@ -16,6 +16,7 @@ verify a value on a new version.
 |---|---|---|---|---|---|
 | v82 (legacy base) | — | 81 | yes | — | original |
 | 562.0.0.53.83 | 342412030 | 83 | yes | 2026-06-06 | found via Debug Console |
+| 576.0.0.47.92 | 345212743 | ? | **not captured** | 2026-09-01 | rebuilt on this base; id still set to 83, needs Debug Console recapture |
 
 ## No Typing — `MailboxSDKJNI.dispatchVOOOZ` (n=5)
 
@@ -23,6 +24,7 @@ verify a value on a new version.
 |---|---|---|---|---|---|
 | v82 (legacy base) | — | 88 | assumed | — | from original code |
 | 562.0.0.53.83 | 342412030 | 90 | pending | 2026-06-06 | captured as `dispatchVOOOZ id=90`; confirm typing is blocked |
+| 576.0.0.47.92 | 345212743 | ? | **not captured** | 2026-09-01 | rebuilt on this base; id still set to 90, needs Debug Console recapture |
 
 ---
 

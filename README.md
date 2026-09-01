@@ -84,7 +84,7 @@ Full runbook (including how to re-resolve hook ids after a Messenger update): se
 ```bash
 # 1. Build the module
 ./gradlew :app:assembleDebug
-# 2. Strip perms + sign + embed into the latest Messenger (downloads it via uptodown)
+# 2. Strip perms + sign + embed into the latest Messenger (downloads it via APKPure)
 bash tools/fetch-messenger.sh download messenger.apk
 bash tools/build-ci.sh messenger.apk app/build/outputs/apk/debug/app-debug.apk dist
 ```
