@@ -81,7 +81,7 @@ jobs:
 
           > ⚠️ **Pre-release.** This is an automated build that hasn't been manually checked yet. If Messenger changed internally since the last update, some features may not work until a fix ships. A confirmed-working build is published as the latest (non-pre-release) version.
 
-          **Features:** hide seen indicator, hide typing indicator, log unsent messages, version spoof.
+          **Features:** hide seen indicator, hide typing indicator, anonymous story viewing, log unsent messages, version spoof.
 
           Open settings by long-pressing the **Messenger** title."
           if gh release view "v$V" >/dev/null 2>&1; then

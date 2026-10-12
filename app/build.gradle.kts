@@ -57,5 +57,6 @@ dependencies {
 
     // Added
     compileOnly(files("libs/api-82.jar"))
+    implementation(libs.dexkit) // finds obfuscated Messenger methods by string/signature at runtime
     runtimeOnly(libs.androidx.preference.ktx)
 }

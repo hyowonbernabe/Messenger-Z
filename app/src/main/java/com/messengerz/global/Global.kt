@@ -11,6 +11,8 @@ object Global {
 
     const val NO_TYPING_FEATURE_TITLE = "Disable Typing Indicator"
     const val NO_TYPING_FEATURE_DESC = "Hide the typing animation while you write."
+    const val NO_STORY_SEEN_FEATURE_TITLE = "Disable Story Seen"
+    const val NO_STORY_SEEN_FEATURE_DESC = "Watch stories without showing up in the viewer list."
 
     const val SPOOF_VERSION_FEATURE_TITLE = "Spoof Latest Version"
     const val SPOOF_VERSION_FEATURE_DESC = "Sets Messenger version to 999.0.0.99.999 (Debug purposes)."

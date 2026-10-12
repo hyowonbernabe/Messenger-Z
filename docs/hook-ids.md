@@ -30,6 +30,12 @@ verify a value on a new version.
 
 ---
 
+## No Story Seen — DexKit lookup, no id
+
+| Messenger version | handlers found | verified | date | notes |
+|---|---|---|---|---|
+| 582.0.0.61.92 | `KMI.C3m` (MSYS), `MSB.C3m` (GraphQL `MontageMarkSeenMutation`) | yes | 2026-10-13 | viewed the user's own story from the test account: not in the viewer list, ring stayed blue. Only `KMI` fired. |
+
 ## Observations / pattern notes
 
 - From v82 → v562, **both** ids shifted by **+2** (seen 81→83, typing 88→90). Consistent

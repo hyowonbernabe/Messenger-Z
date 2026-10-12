@@ -68,6 +68,15 @@ Order matters — the log must contain only the one action:
 
 Also confirm the Message Logger line `CAPTURED: 'mz seen test …'` appeared in step 4.
 
+## 5b. Test No Story Seen
+1. Startup log must show `NoStorySeenFeature: hooked N handlers (…)` with N ≥ 1. `handler not found`
+   means the anchor string moved: decompile the dex holding `MontageMarkSeenMutation` /
+   `markStorySeen` (jadx, one dex at a time — see hook notes in maintenance.md §3) and update
+   `ANCHOR` in `features/NoStorySeenFeature.kt`.
+2. Open any unwatched story (blue ring) on the emulator after `adb logcat -c`. **Pass** =
+   `BLOCKED STORY SEEN` in the log, no non-`Cql` (action) dispatch from `Stories.*`, and the ring
+   stays blue after closing. Only the user can check a story's viewer list — ask them if in doubt.
+
 ## 6. Record
 1. Add rows for `$V` (with versionCode from `aapt2 dump badging`) to both tables in `docs/hook-ids.md`,
    and update the §3 table in `docs/maintenance.md`. Update the comments in the feature files.
@@ -80,7 +89,7 @@ Also confirm the Message Logger line `CAPTURED: 'mz seen test …'` appeared in 
    then `gh release edit v$V --prerelease=false --latest`. Otherwise
    `gh release create v$V MessengerZ-$V.apk --latest --title "Messenger Z $MODVER (Messenger $V)" --notes …`.
    Notes: one line saying it's patched onto Messenger $V and was verified on an emulator
-   (seen + typing blocked), the feature list, and "Open settings by long-pressing the Messenger title."
+   (seen, typing and story seen blocked), the feature list, and "Open settings by long-pressing the Messenger title."
    No pre-release warning.
 4. Delete the local `MessengerZ-$V.apk` copy and tell the user the release link.
 

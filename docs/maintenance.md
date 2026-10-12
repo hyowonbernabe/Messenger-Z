@@ -68,6 +68,7 @@ independently of the command ids.
 |---|---|---|---|---|
 | No Seen | `features/NoSeenFeature.kt` | `MailboxSDKJNI.dispatchVOOOOO`, arg[0] == id | `BLOCK_ID` | **88** (v582) |
 | No Typing | `features/NoTypingFeature.kt` | `MailboxSDKJNI.dispatchVOOOZ`, arg[0] == id | `TYPING_ID_SDK` | **96** (v582) |
+| No Story Seen | `features/NoStorySeenFeature.kt` | every implementation of the `(MontageCard, boolean)` mark-story-read interface (v582: `KMI` = MSYS, `MSB` = GraphQL `MontageMarkSeenMutation`), found via DexKit | anchor string `MontageMsysMarkReadHandler` | n/a (auto) |
 | Spoof Version | `features/SpoofVersionFeature.kt` | `ApplicationPackageManager.getPackageInfo` | none (stable) | n/a |
 | Message Logger | `features/MessageLoggerFeature.kt` | constructors of `com.facebook.messaging.notify.type.NewMessageNotification` + field-name reflection | class/field name substrings | see file |
 | Settings menu | `core/MenuInjector.kt` | `View.setContentDescription == "Messenger"` | the "Messenger" label | n/a |

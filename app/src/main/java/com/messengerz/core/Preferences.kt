@@ -29,6 +29,14 @@ object Preferences {
         prefs?.edit()?.putBoolean("pref_no_typing", enabled)?.apply()
     }
 
+    // --- STORY SEEN ---
+    val isNoStorySeenEnabled: Boolean
+        get() = prefs?.getBoolean("pref_no_story_seen", true) ?: true
+
+    fun setNoStorySeenEnabled(enabled: Boolean) {
+        prefs?.edit()?.putBoolean("pref_no_story_seen", enabled)?.apply()
+    }
+
     // --- SPOOF VERSION ---
     val isSpoofVersionEnabled: Boolean
         get() = prefs?.getBoolean("pref_spoof_version", false) ?: false

@@ -5,7 +5,7 @@
 **Messenger Z** is a non-root modification of Meta's Messenger (`com.facebook.orca`). It is
 an Xposed module baked statically into the Messenger APK with **LSPatch**, so it needs no
 root and no separate manager app. It adds privacy features (hide the seen and typing
-indicators, recover unsent messages) and **installs alongside the Facebook app**.
+indicators, watch stories anonymously, recover unsent messages) and **installs alongside the Facebook app**.
 
 <p align="center">
   <img src="screenshots/features.png" alt="Messenger Z Interface" width="25%">
@@ -17,6 +17,7 @@ indicators, recover unsent messages) and **installs alongside the Facebook app**
 
 *   **👻 No Seen** — read messages without sending the read receipt.
 *   **⌨️ No Typing** — hide the "…" typing indicator while you write.
+*   **🕶️ No Story Seen** — watch stories without appearing in the viewer list.
 *   **🗑️ Unsent Message Logger** — keep a copy of messages that were sent then removed.
 *   **🧪 Spoof Version** — report a very high app version (handy when Meta blocks an old build).
 *   **🛠️ Debug Console** — a tap-through, in-app overlay that shows Messenger's internal
@@ -65,6 +66,9 @@ native messaging bridge, `com.facebook.sdk.mca.MailboxSDKJNI`, which routes oper
 through `dispatch…` methods like `dispatchVOOOO(int commandId, …)`.
 
 *   **No Seen / No Typing** match a specific `(method, commandId)` and drop the call.
+*   **No Story Seen** has no fixed id: it uses [DexKit](https://github.com/LuckyPray/DexKit) at
+    startup to find Messenger's obfuscated "mark story read" handlers (anchored on the
+    `MontageCard` type and a log string) and blocks them, so it survives updates without edits.
 *   The `dispatch…` **method names are signature-encoded and stable** across versions; the
     **numeric command ids drift** when Meta reorders MSYS procedures. That is the usual cause
     of a feature breaking after an update.

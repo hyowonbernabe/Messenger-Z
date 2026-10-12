@@ -86,6 +86,15 @@ object SettingsDialog {
 
         addSpacer(context, mainLayout)
 
+        // Story seen
+        addSwitchRow(context, mainLayout,
+            Global.NO_STORY_SEEN_FEATURE_TITLE,
+            Global.NO_STORY_SEEN_FEATURE_DESC,
+            Preferences.isNoStorySeenEnabled
+        ) { isChecked -> Preferences.setNoStorySeenEnabled(isChecked) }
+
+        addSpacer(context, mainLayout)
+
         // Spoof Version
         addSwitchRow(context, mainLayout,
             Global.SPOOF_VERSION_FEATURE_TITLE,
