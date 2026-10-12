@@ -25,12 +25,12 @@ import java.util.Locale
 /** Unsent / edited message log, grouped by sender. Tap an entry to copy it. */
 object MessageLogDialog {
 
-    private const val COLOR_BG = 0xFF1E1E1E.toInt()
+    private const val COLOR_BG = 0xFF121316.toInt()
     private const val COLOR_ACCENT = 0xFFFF3B30.toInt()
     private const val COLOR_TEXT_PRIMARY = 0xFFFFFFFF.toInt()
-    private const val COLOR_TEXT_SECONDARY = 0xFFB0B3B8.toInt()
+    private const val COLOR_TEXT_SECONDARY = 0xFF9EA3AB.toInt()
     private const val COLOR_DIVIDER = 0xFF3E4042.toInt()
-    private const val COLOR_CHIP = 0xFF2C2D2F.toInt()
+    private const val COLOR_CHIP = 0xFF1E1F23.toInt()
 
     fun show(context: Context) {
         val dialog = AlertDialog.Builder(context).create()
@@ -46,8 +46,7 @@ object MessageLogDialog {
                 setPadding(pad, pad, pad, pad)
                 background = GradientDrawable().apply {
                     setColor(COLOR_BG)
-                    cornerRadius = dp(context, 20).toFloat()
-                    setStroke(dp(context, 2), COLOR_ACCENT)
+                    cornerRadius = dp(context, 26).toFloat()
                 }
             }
             root.addView(TextView(context).apply {

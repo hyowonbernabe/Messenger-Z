@@ -11,325 +11,252 @@ import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.net.toUri
+import com.messengerz.core.AppControl
+import com.messengerz.core.GhostChats
 import com.messengerz.core.Preferences
 import com.messengerz.global.Global
 
+/**
+ * Messenger Z settings. Opened by long-pressing the "Messenger" title (see MenuInjector).
+ * Grouped cards; tapping anywhere on a row toggles it.
+ */
 object SettingsDialog {
-    private const val COLOR_BG = 0xFF1E1E1E.toInt()
+    private const val COLOR_BG = 0xFF121316.toInt()
+    private const val COLOR_CARD = 0xFF1E1F23.toInt()
     private const val COLOR_ACCENT = 0xFFFF3B30.toInt()
-    private const val COLOR_ACCENT_DIM = 0x4DFF3B30.toInt()
-    private const val COLOR_TEXT_PRIMARY = 0xFFFFFFFF.toInt()
-    private const val COLOR_TEXT_SECONDARY = 0xFFB0B3B8.toInt()
-    private const val COLOR_DIVIDER = 0xFF3E4042.toInt()
-    private const val COLOR_SWITCH_OFF = 0xFFB0B0B0.toInt()
-    private const val COLOR_TRACK_OFF = 0xFF505050.toInt()
+    private const val COLOR_ACCENT_DIM = 0x55FF3B30
+    private const val COLOR_TEXT_PRIMARY = 0xFFF2F3F5.toInt()
+    private const val COLOR_TEXT_SECONDARY = 0xFF9EA3AB.toInt()
+    private const val COLOR_DIVIDER = 0xFF2B2D32.toInt()
+    private const val COLOR_SWITCH_OFF = 0xFFB8BCC4.toInt()
+    private const val COLOR_TRACK_OFF = 0xFF3A3C42.toInt()
 
     fun show(context: Context) {
-        val builder = AlertDialog.Builder(context)
-        val dialog = builder.create()
-
-        val scrollView = ScrollView(context)
-        scrollView.isFillViewport = true
-
-        // Main Card
-        val mainLayout = LinearLayout(context)
-        mainLayout.orientation = LinearLayout.VERTICAL
-        val pad = dp(context, 24)
-        mainLayout.setPadding(pad, pad, pad, pad)
-
-        val bgShape = GradientDrawable()
-        bgShape.color = ColorStateList.valueOf(COLOR_BG)
-        bgShape.cornerRadius = dp(context, 20).toFloat()
-        bgShape.setStroke(dp(context, 2), COLOR_ACCENT)
-        mainLayout.background = bgShape
+        val dialog = AlertDialog.Builder(context).create()
+        val root = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(context, 20), dp(context, 22), dp(context, 20), dp(context, 18))
+            background = GradientDrawable().apply { setColor(COLOR_BG); cornerRadius = dp(context, 26).toFloat() }
+        }
 
         // --- Header ---
-        val title = TextView(context)
-        title.text = Global.MESSENGER_Z_TITLE
-        title.textSize = 22f
-        title.setTypeface(null, Typeface.BOLD)
-        title.setTextColor(COLOR_TEXT_PRIMARY)
-        title.gravity = Gravity.CENTER
-        mainLayout.addView(title)
+        root.addView(TextView(context).apply {
+            text = Global.MESSENGER_Z_TITLE
+            textSize = 24f
+            setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD))
+            setTextColor(COLOR_TEXT_PRIMARY)
+            gravity = Gravity.CENTER
+        })
+        root.addView(TextView(context).apply {
+            text = "${Global.VERSION}  ·  Messenger ${com.messengerz.BuildConfig.MESSENGER_VER}"
+            textSize = 12f
+            setTextColor(COLOR_ACCENT)
+            gravity = Gravity.CENTER
+            setPadding(dp(context, 12), dp(context, 4), dp(context, 12), dp(context, 4))
+            background = GradientDrawable().apply { setColor(0x1FFF3B30); cornerRadius = dp(context, 50).toFloat() }
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                .apply { gravity = Gravity.CENTER_HORIZONTAL; setMargins(0, dp(context, 8), 0, dp(context, 6)) }
+        })
 
-        val subtitle = TextView(context)
-        subtitle.text = "${Global.VERSION}  ·  Messenger ${com.messengerz.BuildConfig.MESSENGER_VER}"
-        subtitle.textSize = 13f
-        subtitle.setTextColor(COLOR_ACCENT)
-        subtitle.gravity = Gravity.CENTER
-        subtitle.setPadding(0, 0, 0, dp(context, 24))
-        mainLayout.addView(subtitle)
+        val content = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
 
-        // --- Features ---
-
-        // Seen
-        addSwitchRow(context, mainLayout,
-            Global.NO_SEEN_FEATURE_TITLE,
-            Global.NO_SEEN_FEATURE_DESC,
-            Preferences.isNoSeenEnabled
-        ) { isChecked -> Preferences.setNoSeenEnabled(isChecked) }
-
-        addSpacer(context, mainLayout)
-
-        // Typing
-        addSwitchRow(context, mainLayout,
-            Global.NO_TYPING_FEATURE_TITLE,
-            Global.NO_TYPING_FEATURE_DESC,
-            Preferences.isNoTypingEnabled
-        ) { isChecked -> Preferences.setNoTypingEnabled(isChecked) }
-
-        addSpacer(context, mainLayout)
-
-        // Story seen
-        addSwitchRow(context, mainLayout,
-            Global.NO_STORY_SEEN_FEATURE_TITLE,
-            Global.NO_STORY_SEEN_FEATURE_DESC,
-            Preferences.isNoStorySeenEnabled
-        ) { isChecked -> Preferences.setNoStorySeenEnabled(isChecked) }
-
-        // Who ghost mode applies to (per-chat exceptions)
-        val btnGhost = Button(context)
-        fun ghostLabel() = "Applies to: " + com.messengerz.core.GhostChats.mode.label
-        btnGhost.text = ghostLabel()
-        btnGhost.isAllCaps = false
-        btnGhost.setTextColor(COLOR_TEXT_PRIMARY)
-        btnGhost.textSize = 14f
-        btnGhost.background = GradientDrawable().apply { setColor(COLOR_DIVIDER); cornerRadius = dp(context, 50).toFloat() }
-        btnGhost.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            .apply { setMargins(0, dp(context, 4), 0, 0) }
-        btnGhost.setOnClickListener { GhostChatsDialog.show(context) { btnGhost.text = ghostLabel() } }
-        mainLayout.addView(btnGhost)
-
-        addSpacer(context, mainLayout)
-
-        // Appear offline
-        addSwitchRow(context, mainLayout,
-            Global.APPEAR_OFFLINE_TITLE,
-            Global.APPEAR_OFFLINE_DESC,
-            Preferences.isAppearOfflineEnabled
-        ) { isChecked -> Preferences.setAppearOfflineEnabled(isChecked) }
-
-        addSpacer(context, mainLayout)
-
-        // Link cleaning
-        addSwitchRow(context, mainLayout,
-            Global.CLEAN_LINKS_TITLE,
-            Global.CLEAN_LINKS_DESC,
-            Preferences.isCleanLinksEnabled
-        ) { isChecked -> Preferences.setCleanLinksEnabled(isChecked) }
-
-        addSpacer(context, mainLayout)
-
-        // Spoof Version
-        addSwitchRow(context, mainLayout,
-            Global.SPOOF_VERSION_FEATURE_TITLE,
-            Global.SPOOF_VERSION_FEATURE_DESC,
-            Preferences.isSpoofVersionEnabled
-        ) { isChecked -> Preferences.setSpoofVersionEnabled(isChecked) }
-
-        addSpacer(context, mainLayout)
-
-        // Message Logger Logic
-
-        val btnLogs = Button(context)
-        btnLogs.text = "View Unsent & Edited Messages"
-        btnLogs.setTextColor(COLOR_TEXT_PRIMARY)
-        btnLogs.textSize = 14f
-        btnLogs.setTypeface(null, Typeface.BOLD)
-
-        val btnBg = GradientDrawable()
-        btnBg.setColor(COLOR_DIVIDER) // Distinct color for secondary action
-        btnBg.cornerRadius = dp(context, 50).toFloat()
-        btnLogs.background = btnBg
-
-        val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        params.setMargins(0, dp(context, 12), 0, 0)
-        btnLogs.layoutParams = params
-
-        btnLogs.visibility = if (Preferences.isMessageLoggerEnabled) View.VISIBLE else View.GONE
-
-        btnLogs.setOnClickListener {
-            MessageLogDialog.show(context)
+        // --- Ghost mode ---
+        section(context, content, "Ghost mode").apply {
+            switchRow(context, this, Global.NO_SEEN_FEATURE_TITLE, Global.NO_SEEN_FEATURE_DESC, Preferences.isNoSeenEnabled) { Preferences.setNoSeenEnabled(it) }
+            switchRow(context, this, Global.NO_TYPING_FEATURE_TITLE, Global.NO_TYPING_FEATURE_DESC, Preferences.isNoTypingEnabled) { Preferences.setNoTypingEnabled(it) }
+            switchRow(context, this, Global.NO_STORY_SEEN_FEATURE_TITLE, Global.NO_STORY_SEEN_FEATURE_DESC, Preferences.isNoStorySeenEnabled) { Preferences.setNoStorySeenEnabled(it) }
+            lateinit var applies: TextView
+            applies = actionRow(context, this, "Applies to", GhostChats.mode.label) {
+                GhostChatsDialog.show(context) { applies.text = GhostChats.mode.label }
+            }
         }
 
-        addSwitchRow(context, mainLayout,
-            Global.MESSAGE_LOG_FEATURE_TITLE,
-            Global.MESSAGE_LOG_FEATURE_DESC,
-            Preferences.isMessageLoggerEnabled
-        ) { isChecked ->
-            Preferences.setMessageLoggerEnabled(isChecked)
-            btnLogs.visibility = if (isChecked) View.VISIBLE else View.GONE
+        // --- Messages ---
+        section(context, content, "Messages").apply {
+            switchRow(context, this, Global.MESSAGE_LOG_FEATURE_TITLE, Global.MESSAGE_LOG_FEATURE_DESC, Preferences.isMessageLoggerEnabled) { Preferences.setMessageLoggerEnabled(it) }
+            switchRow(context, this, Global.LOGGER_INLINE_TITLE, Global.LOGGER_INLINE_DESC, Preferences.isLoggerInlineEnabled) { Preferences.setLoggerInlineEnabled(it) }
+            actionRow(context, this, "Unsent & edited messages", "Open the log") { MessageLogDialog.show(context) }
         }
 
-        addSwitchRow(context, mainLayout,
-            Global.LOGGER_INLINE_TITLE,
-            Global.LOGGER_INLINE_DESC,
-            Preferences.isLoggerInlineEnabled
-        ) { isChecked -> Preferences.setLoggerInlineEnabled(isChecked) }
-
-        mainLayout.addView(btnLogs)
-
-        // --- Debug Console (signal finder) ---
-        val btnDebug = Button(context)
-        btnDebug.text = "Debug Console"
-        btnDebug.setTextColor(COLOR_TEXT_PRIMARY)
-        btnDebug.textSize = 14f
-        btnDebug.setTypeface(null, Typeface.BOLD)
-        btnDebug.isAllCaps = false
-        val debugBg = GradientDrawable()
-        debugBg.setColor(COLOR_DIVIDER)
-        debugBg.cornerRadius = dp(context, 50).toFloat()
-        btnDebug.background = debugBg
-        val debugParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        debugParams.setMargins(0, dp(context, 12), 0, 0)
-        btnDebug.layoutParams = debugParams
-        btnDebug.setOnClickListener {
-            dialog.dismiss()
-            DebugConsoleOverlay.show(context)
+        // --- Links & presence ---
+        section(context, content, "Links & presence").apply {
+            switchRow(context, this, Global.CLEAN_LINKS_TITLE, Global.CLEAN_LINKS_DESC, Preferences.isCleanLinksEnabled) { Preferences.setCleanLinksEnabled(it) }
+            switchRow(context, this, Global.APPEAR_OFFLINE_TITLE, Global.APPEAR_OFFLINE_DESC, Preferences.isAppearOfflineEnabled) { Preferences.setAppearOfflineEnabled(it) }
+            switchRow(context, this, Global.SPOOF_VERSION_FEATURE_TITLE, Global.SPOOF_VERSION_FEATURE_DESC, Preferences.isSpoofVersionEnabled) { Preferences.setSpoofVersionEnabled(it) }
         }
-        mainLayout.addView(btnDebug)
 
+        // --- Tools ---
+        section(context, content, "Tools").apply {
+            actionRow(context, this, "Restart Messenger", "Apply changes that need a restart") { AppControl.restart(context) }
+            actionRow(context, this, "Clear Messenger cache", "Free space used by cached media") {
+                confirm(context, "Clear cache?", "Cached images and videos will be downloaded again when needed.") {
+                    val mb = AppControl.clearCache(context) / (1024 * 1024)
+                    Toast.makeText(context, "Cleared $mb MB", Toast.LENGTH_SHORT).show()
+                }
+            }
+            actionRow(context, this, "Reset learned data", "Re-detect message layout and chats, then restart") {
+                confirm(context, "Reset learned data?", "Messenger Z will re-learn automatically. Your logs are kept.") {
+                    AppControl.resetLearnedData(context)
+                    AppControl.restart(context)
+                }
+            }
+            actionRow(context, this, "Debug Console", "Live list of Messenger's internal calls") {
+                dialog.dismiss()
+                DebugConsoleOverlay.show(context)
+            }
+        }
 
         // --- Footer ---
+        content.addView(TextView(context).apply {
+            text = Global.MESSENGER_Z_AUTHOR
+            textSize = 12f
+            setTextColor(COLOR_TEXT_SECONDARY)
+            gravity = Gravity.CENTER
+            setPadding(0, dp(context, 18), 0, 0)
+        })
+        content.addView(TextView(context).apply {
+            text = Global.MESSENGER_Z_GITHUB.removePrefix("https://")
+            textSize = 12f
+            setTextColor(COLOR_ACCENT)
+            gravity = Gravity.CENTER
+            setPadding(0, dp(context, 2), 0, dp(context, 6))
+            setOnClickListener {
+                try {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Global.MESSENGER_Z_GITHUB.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } catch (e: Exception) {}
+            }
+        })
 
-        // Divider
-        val divider = View(context)
-        divider.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(context, 1))
-        divider.setBackgroundColor(COLOR_DIVIDER)
-        val divParams = divider.layoutParams as LinearLayout.LayoutParams
-        divParams.setMargins(0, dp(context, 20), 0, dp(context, 20))
-        divider.layoutParams = divParams
-        mainLayout.addView(divider)
+        root.addView(ScrollView(context).apply {
+            isVerticalScrollBarEnabled = false
+            addView(content)
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
+        })
 
-        // Credits
-        val author = TextView(context)
-        author.text = Global.MESSENGER_Z_AUTHOR
-        author.textSize = 13f
-        author.setTextColor(COLOR_TEXT_SECONDARY)
-        author.gravity = Gravity.CENTER
-        mainLayout.addView(author)
+        root.addView(TextView(context).apply {
+            text = "Done"
+            textSize = 15f
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.WHITE)
+            gravity = Gravity.CENTER
+            setPadding(0, dp(context, 14), 0, dp(context, 14))
+            background = GradientDrawable().apply { setColor(COLOR_ACCENT); cornerRadius = dp(context, 50).toFloat() }
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                .apply { setMargins(0, dp(context, 12), 0, 0) }
+            setOnClickListener { dialog.dismiss() }
+        })
 
-        val github = TextView(context)
-        github.text = Global.MESSENGER_Z_GITHUB
-        github.textSize = 13f
-        github.setTextColor(COLOR_ACCENT)
-        github.gravity = Gravity.CENTER
-        github.setPadding(0, dp(context, 4), 0, dp(context, 20))
-        github.setOnClickListener {
-            try {
-                val intent = Intent(Intent.ACTION_VIEW, Global.MESSENGER_Z_GITHUB.toUri())
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-            } catch (e: Exception) {}
-        }
-        mainLayout.addView(github)
-
-        // Done Button
-        val btnClose = Button(context)
-        btnClose.text = "Done"
-        btnClose.setTextColor(COLOR_TEXT_PRIMARY)
-        btnClose.textSize = 14f
-        btnClose.setTypeface(null, Typeface.BOLD)
-
-        val closeBg = GradientDrawable()
-        closeBg.setColor(COLOR_ACCENT)
-        closeBg.cornerRadius = dp(context, 50).toFloat()
-        btnClose.background = closeBg
-
-        btnClose.setOnClickListener { dialog.dismiss() }
-        mainLayout.addView(btnClose)
-
-        scrollView.addView(mainLayout)
-        dialog.setView(scrollView)
-
+        val height = (context.resources.displayMetrics.heightPixels * 0.85).toInt()
+        val frame = LinearLayout(context).apply { addView(root, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)) }
+        dialog.setView(frame)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()
     }
 
-    private fun addSwitchRow(
-        context: Context,
-        parent: LinearLayout,
-        titleText: String,
-        descText: String,
-        initialState: Boolean,
-        onToggle: (Boolean) -> Unit
-    ) {
-        val row = LinearLayout(context)
-        row.orientation = LinearLayout.HORIZONTAL
-        row.gravity = Gravity.CENTER_VERTICAL
-        row.setPadding(0, dp(context, 8), 0, dp(context, 8))
-
-        val textLayout = LinearLayout(context)
-        textLayout.orientation = LinearLayout.VERTICAL
-        textLayout.layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-
-        val tvTitle = TextView(context)
-        tvTitle.text = titleText
-        tvTitle.textSize = 16f
-        tvTitle.setTypeface(null, Typeface.BOLD)
-        tvTitle.setTextColor(COLOR_TEXT_PRIMARY)
-
-        val tvDesc = TextView(context)
-        tvDesc.text = descText
-        tvDesc.textSize = 12f
-        tvDesc.setTextColor(COLOR_TEXT_SECONDARY)
-
-        textLayout.addView(tvTitle)
-        textLayout.addView(tvDesc)
-
-        val switchView = Switch(context)
-        switchView.isChecked = initialState
-
-        val thumbStates = ColorStateList(
-            arrayOf(
-                intArrayOf(android.R.attr.state_checked),
-                intArrayOf(-android.R.attr.state_checked)
-            ),
-            intArrayOf(
-                COLOR_ACCENT,
-                COLOR_SWITCH_OFF
-            )
-        )
-        switchView.thumbTintList = thumbStates
-
-        val trackStates = ColorStateList(
-            arrayOf(
-                intArrayOf(android.R.attr.state_checked),
-                intArrayOf(-android.R.attr.state_checked)
-            ),
-            intArrayOf(
-                COLOR_ACCENT_DIM,
-                COLOR_TRACK_OFF
-            )
-        )
-        switchView.trackTintList = trackStates
-
-        switchView.setOnCheckedChangeListener { _, isChecked -> onToggle(isChecked) }
-
-        row.addView(textLayout)
-        row.addView(switchView)
-        parent.addView(row)
+    /** Section label + rounded card; returns the card to add rows to. */
+    private fun section(context: Context, parent: LinearLayout, title: String): LinearLayout {
+        parent.addView(TextView(context).apply {
+            text = title.uppercase()
+            textSize = 11f
+            letterSpacing = 0.08f
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(COLOR_TEXT_SECONDARY)
+            setPadding(dp(context, 6), dp(context, 18), 0, dp(context, 8))
+        })
+        val card = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            background = GradientDrawable().apply { setColor(COLOR_CARD); cornerRadius = dp(context, 18).toFloat() }
+            clipToOutline = true
+        }
+        parent.addView(card)
+        return card
     }
 
-    private fun addSpacer(context: Context, layout: LinearLayout) {
-        val view = View(context)
-        view.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(context, 12))
-        layout.addView(view)
+    private fun addDividerIfNeeded(context: Context, card: LinearLayout) {
+        if (card.childCount == 0) return
+        card.addView(View(context).apply {
+            setBackgroundColor(COLOR_DIVIDER)
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(context, 1))
+                .apply { setMargins(dp(context, 16), 0, dp(context, 16), 0) }
+        })
     }
 
-    private fun dp(context: Context, dp: Int): Int {
-        return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            dp.toFloat(),
-            context.resources.displayMetrics
-        ).toInt()
+    private fun textBlock(context: Context, title: String, desc: String?): Pair<LinearLayout, TextView?> {
+        var descView: TextView? = null
+        val block = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            addView(TextView(context).apply {
+                text = title
+                textSize = 15f
+                setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL))
+                setTextColor(COLOR_TEXT_PRIMARY)
+            })
+            if (desc != null) addView(TextView(context).apply {
+                text = desc
+                textSize = 12.5f
+                setTextColor(COLOR_TEXT_SECONDARY)
+                setPadding(0, dp(context, 2), 0, 0)
+                descView = this
+            })
+        }
+        return block to descView
     }
+
+    private fun switchRow(context: Context, card: LinearLayout, title: String, desc: String, initial: Boolean, onToggle: (Boolean) -> Unit) {
+        addDividerIfNeeded(context, card)
+        val sw = Switch(context).apply {
+            isChecked = initial
+            thumbTintList = states(COLOR_ACCENT, COLOR_SWITCH_OFF)
+            trackTintList = states(COLOR_ACCENT_DIM, COLOR_TRACK_OFF)
+            setOnCheckedChangeListener { _, on -> onToggle(on) }
+        }
+        card.addView(LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(context, 16), dp(context, 13), dp(context, 12), dp(context, 13))
+            addView(textBlock(context, title, desc).first)
+            addView(sw)
+            setOnClickListener { sw.toggle() }
+            isClickable = true
+        })
+    }
+
+    /** Row that opens something; returns the subtitle view so callers can update it. */
+    private fun actionRow(context: Context, card: LinearLayout, title: String, subtitle: String, onClick: () -> Unit): TextView {
+        addDividerIfNeeded(context, card)
+        val (block, descView) = textBlock(context, title, subtitle)
+        card.addView(LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(context, 16), dp(context, 14), dp(context, 16), dp(context, 14))
+            addView(block)
+            addView(TextView(context).apply { text = "›"; textSize = 22f; setTextColor(COLOR_TEXT_SECONDARY) })
+            setOnClickListener { onClick() }
+        })
+        return descView!!
+    }
+
+    private fun confirm(context: Context, title: String, message: String, onYes: () -> Unit) {
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK") { _, _ -> onYes() }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun states(on: Int, off: Int) = ColorStateList(
+        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf(-android.R.attr.state_checked)),
+        intArrayOf(on, off)
+    )
+
+    private fun dp(context: Context, dp: Int): Int =
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), context.resources.displayMetrics).toInt()
 }
