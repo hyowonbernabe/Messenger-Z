@@ -15,6 +15,7 @@ object FeatureManager {
         NoStorySeenFeature.init(lpparam)
         SpoofVersionFeature.init(lpparam)
         com.messengerz.features.CleanLinksFeature.init(lpparam)
+        com.messengerz.features.AppearOfflineFeature.init(lpparam)
         MessageLoggerFeature.init(lpparam)
         DispatchProbe.init(lpparam)
     }

@@ -37,6 +37,14 @@ object Preferences {
         prefs?.edit()?.putBoolean("pref_no_story_seen", enabled)?.apply()
     }
 
+    // --- APPEAR OFFLINE ---
+    val isAppearOfflineEnabled: Boolean
+        get() = prefs?.getBoolean("pref_appear_offline", false) ?: false
+
+    fun setAppearOfflineEnabled(enabled: Boolean) {
+        prefs?.edit()?.putBoolean("pref_appear_offline", enabled)?.apply()
+    }
+
     // --- LINK CLEANING ---
     val isCleanLinksEnabled: Boolean
         get() = prefs?.getBoolean("pref_clean_links", true) ?: true

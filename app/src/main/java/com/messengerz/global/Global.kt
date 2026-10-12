@@ -11,6 +11,8 @@ object Global {
 
     const val NO_TYPING_FEATURE_TITLE = "Disable Typing Indicator"
     const val NO_TYPING_FEATURE_DESC = "Hide the typing animation while you write."
+    const val APPEAR_OFFLINE_TITLE = "Appear Offline"
+    const val APPEAR_OFFLINE_DESC = "Hide your \"Active now\" while still seeing others. Restart Messenger to apply."
     const val CLEAN_LINKS_TITLE = "Remove Link Tracking"
     const val CLEAN_LINKS_DESC = "Open links without Facebook's redirect and tracking tags."
     const val NO_STORY_SEEN_FEATURE_TITLE = "Disable Story Seen"

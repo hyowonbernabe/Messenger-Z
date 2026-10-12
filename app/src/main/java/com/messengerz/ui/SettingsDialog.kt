@@ -108,6 +108,15 @@ object SettingsDialog {
 
         addSpacer(context, mainLayout)
 
+        // Appear offline
+        addSwitchRow(context, mainLayout,
+            Global.APPEAR_OFFLINE_TITLE,
+            Global.APPEAR_OFFLINE_DESC,
+            Preferences.isAppearOfflineEnabled
+        ) { isChecked -> Preferences.setAppearOfflineEnabled(isChecked) }
+
+        addSpacer(context, mainLayout)
+
         // Link cleaning
         addSwitchRow(context, mainLayout,
             Global.CLEAN_LINKS_TITLE,
