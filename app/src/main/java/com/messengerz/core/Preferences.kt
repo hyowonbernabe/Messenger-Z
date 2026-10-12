@@ -47,9 +47,17 @@ object Preferences {
 
     // --- MESSAGE LOGGER ---
     val isMessageLoggerEnabled: Boolean
-        get() = prefs?.getBoolean("pref_msg_logger", false) ?: false
+        get() = prefs?.getBoolean("pref_msg_logger", true) ?: true
 
     fun setMessageLoggerEnabled(enabled: Boolean) {
         prefs?.edit()?.putBoolean("pref_msg_logger", enabled)?.apply()
+    }
+
+    /** Show the original text in place of "X unsent a message" inside the chat. */
+    val isLoggerInlineEnabled: Boolean
+        get() = prefs?.getBoolean("pref_logger_inline", true) ?: true
+
+    fun setLoggerInlineEnabled(enabled: Boolean) {
+        prefs?.edit()?.putBoolean("pref_logger_inline", enabled)?.apply()
     }
 }

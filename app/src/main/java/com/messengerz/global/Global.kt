@@ -17,7 +17,9 @@ object Global {
     const val SPOOF_VERSION_FEATURE_TITLE = "Spoof Latest Version"
     const val SPOOF_VERSION_FEATURE_DESC = "Sets Messenger version to 999.0.0.99.999 (Debug purposes)."
     const val MESSAGE_LOG_FEATURE_TITLE = "Logs Unsent Messages"
-    const val MESSAGE_LOG_FEATURE_DESC = "Any unsent messages will be saved."
-    const val MESSAGE_LOG_FEATURE_EMPTY = "No deleted messages captured yet."
-    const val MESSAGE_LOG_FEATURE_CLEAR = "Clear All Logs"
+    const val MESSAGE_LOG_FEATURE_DESC = "Keep a copy of messages people unsend or edit."
+    const val LOGGER_INLINE_TITLE = "Show Unsent Text In Chat"
+    const val LOGGER_INLINE_DESC = "Replace \"unsent a message\" with the original text."
+    const val MESSAGE_LOG_FEATURE_EMPTY = "Nothing captured yet."
+    const val MESSAGE_LOG_FEATURE_CLEAR = "Clear Unsent Log"
 }

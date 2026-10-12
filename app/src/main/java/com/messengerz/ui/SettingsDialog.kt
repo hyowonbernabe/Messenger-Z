@@ -107,7 +107,7 @@ object SettingsDialog {
         // Message Logger Logic
 
         val btnLogs = Button(context)
-        btnLogs.text = "View Unsent Messages"
+        btnLogs.text = "View Unsent & Edited Messages"
         btnLogs.setTextColor(COLOR_TEXT_PRIMARY)
         btnLogs.textSize = 14f
         btnLogs.setTypeface(null, Typeface.BOLD)
@@ -135,6 +135,12 @@ object SettingsDialog {
             Preferences.setMessageLoggerEnabled(isChecked)
             btnLogs.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
+
+        addSwitchRow(context, mainLayout,
+            Global.LOGGER_INLINE_TITLE,
+            Global.LOGGER_INLINE_DESC,
+            Preferences.isLoggerInlineEnabled
+        ) { isChecked -> Preferences.setLoggerInlineEnabled(isChecked) }
 
         mainLayout.addView(btnLogs)
 

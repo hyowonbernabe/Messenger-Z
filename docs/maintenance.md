@@ -54,9 +54,11 @@ Two facts matter:
 **So the usual breakage is: a feature's hardcoded command id is stale.** The hook still
 installs (the method exists), it just never matches, and the feature silently does nothing.
 
-A second, separate fragility: `MessageLoggerFeature` identifies fields by class-name
-substrings and a field name (`A1X`). Those *can* be re-obfuscated and may need re-checking
-independently of the command ids.
+The Message Logger avoids hardcoded names: it watches `JQLResultSet.getString` (MSYS row reads,
+unobfuscated `m*` fields) and learns which column holds bubble text from the first unsend
+placeholder or from a text it saw in a notification. Unsent rows lose their message id but keep
+their timestamp, so messages are keyed by `t<timestamp ms>`. Placeholder detection is English
+("X unsent/deleted/removed a message"); other UI languages won't match.
 
 ---
 
@@ -70,7 +72,7 @@ independently of the command ids.
 | No Typing | `features/NoTypingFeature.kt` | `MailboxSDKJNI.dispatchVOOOZ`, arg[0] == id | `TYPING_ID_SDK` | **96** (v582) |
 | No Story Seen | `features/NoStorySeenFeature.kt` | every implementation of the `(MontageCard, boolean)` mark-story-read interface (v582: `KMI` = MSYS, `MSB` = GraphQL `MontageMarkSeenMutation`), found via DexKit | anchor string `MontageMsysMarkReadHandler` | n/a (auto) |
 | Spoof Version | `features/SpoofVersionFeature.kt` | `ApplicationPackageManager.getPackageInfo` | none (stable) | n/a |
-| Message Logger | `features/MessageLoggerFeature.kt` | constructors of `com.facebook.messaging.notify.type.NewMessageNotification` + field-name reflection | class/field name substrings | see file |
+| Message Logger | `features/MessageLoggerFeature.kt` + `core/MsysRows.kt` | `com.facebook.msys.mci.JQLResultSet.getString` (every chat bubble read) | none — text/time/name columns are **learned at runtime** per Messenger build (prefs key `logger_layouts_<versionCode>`) | auto |
 | Settings menu | `core/MenuInjector.kt` | `View.setContentDescription == "Messenger"` | the "Messenger" label | n/a |
 | Debug Console (tool) | `features/DispatchProbe.kt` + `ui/DebugConsoleOverlay.kt` | all `MailboxSDKJNI.dispatch*` (logcat mode: every `Mailbox*JNI`) | none | n/a |
 
