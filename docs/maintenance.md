@@ -66,12 +66,12 @@ independently of the command ids.
 
 | Feature | File | Hooked target | Version-specific constant | Current value |
 |---|---|---|---|---|
-| No Seen | `features/NoSeenFeature.kt` | `MailboxSDKJNI.dispatchVOOOO`, arg[0] == id | `BLOCK_ID` | **83** (v562) |
-| No Typing | `features/NoTypingFeature.kt` | `MailboxSDKJNI.dispatchVOOOZ`, arg[0] == id | `TYPING_ID_SDK` | **90** (v562, pending confirm) |
+| No Seen | `features/NoSeenFeature.kt` | `MailboxSDKJNI.dispatchVOOOOO`, arg[0] == id | `BLOCK_ID` | **88** (v582) |
+| No Typing | `features/NoTypingFeature.kt` | `MailboxSDKJNI.dispatchVOOOZ`, arg[0] == id | `TYPING_ID_SDK` | **96** (v582) |
 | Spoof Version | `features/SpoofVersionFeature.kt` | `ApplicationPackageManager.getPackageInfo` | none (stable) | n/a |
 | Message Logger | `features/MessageLoggerFeature.kt` | constructors of `com.facebook.messaging.notify.type.NewMessageNotification` + field-name reflection | class/field name substrings | see file |
 | Settings menu | `core/MenuInjector.kt` | `View.setContentDescription == "Messenger"` | the "Messenger" label | n/a |
-| Debug Console (tool) | `features/DispatchProbe.kt` + `ui/DebugConsoleOverlay.kt` | all `MailboxSDKJNI.dispatch*` | none | n/a |
+| Debug Console (tool) | `features/DispatchProbe.kt` + `ui/DebugConsoleOverlay.kt` | all `MailboxSDKJNI.dispatch*` (logcat mode: every `Mailbox*JNI`) | none | n/a |
 
 ---
 
@@ -107,6 +107,12 @@ so you do not have to decompile by hand.
 > **Note:** the LSPatch *CLI* (`tools/lspatch/lspatch.jar`) works headless on desktop and
 > in CI. (An older `tools/STATUS.md` claims it failed — that is outdated; the bundled jar
 > works.)
+>
+> **Which LSPatch:** `tools/lspatch/lspatch.jar` is JingMatrix/LSPatch v1.2 **plus PR #121**
+> (CI build 489, run 34022315016). Stock v1.2 and older builds drop Messenger's own
+> `AppComponentFactory` (log: `Original AppComponentFactory not found: …M4aAppComponentFactory`),
+> which makes Messenger crash at launch in a different way each time. Only replace the jar
+> with a release that includes #121. It signs with the same key, so updates install over the top.
 
 ### 4.2 Install and capture the signal
 
@@ -204,5 +210,6 @@ that looks obfuscated, and record the id (with the Messenger version it was foun
 | `INSTALL_FAILED_DUPLICATE_PERMISSION` | new shared permission with Facebook | add it to `$ConflictingPermissions` (§5) |
 | App crashes on first launches then opens | LSPatch loader warm-up / deprecated base | use a current Messenger base; usually transient |
 | "This app version is deprecated" on calls | patched base APK too old | rebuild on the latest Messenger version |
+| Crash at launch, log says `Original AppComponentFactory not found` | LSPatch without PR #121 | use the bundled 489 jar (see §4.1 note) |
 | No `MessengerZ` logs at all | LSPatch not loading the module | re-check the embed step / sigbypass level |
 | Settings menu won't open | header content-description changed | re-check the label in `MenuInjector.kt` |

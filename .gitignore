@@ -32,3 +32,6 @@ local.properties
 /tools/jadx-mcp/server/
 
 .mcp.json.local
+
+# Local-only /update test config (private chat link etc.)
+/.claude/*.local.*

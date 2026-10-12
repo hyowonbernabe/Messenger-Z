@@ -10,9 +10,9 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 object NoSeenFeature {
     private const val TAG = "MessengerZ"
 
-    // MailboxSDKJNI.dispatchVOOOO command id for "mark thread read / send seen".
-    // Meta shuffles this per Messenger version. v82=81, v562=83 (found via Debug Console).
-    private const val BLOCK_ID = 83
+    // MailboxSDKJNI.dispatchVOOOOO command id for "mark thread read / send seen".
+    // Meta shuffles this per Messenger version. v82=81, v562=83 (dispatchVOOOO), v582=88 (dispatchVOOOOO, gained an arg).
+    private const val BLOCK_ID = 88
 
     fun init(lpparam: XC_LoadPackage.LoadPackageParam) {
         try {
@@ -23,7 +23,7 @@ object NoSeenFeature {
                 return
             }
 
-            val targetMethod = sdkClass.declaredMethods.firstOrNull { it.name == "dispatchVOOOO" }
+            val targetMethod = sdkClass.declaredMethods.firstOrNull { it.name == "dispatchVOOOOO" }
 
             if (targetMethod != null) {
                 XposedBridge.hookMethod(targetMethod, object : XC_MethodHook() {
@@ -40,7 +40,7 @@ object NoSeenFeature {
                 })
                 Log.d(TAG, "NoSeenFeature: Hooked successfully.")
             } else {
-                Log.e(TAG, "Error: dispatchVOOOO method not found.")
+                Log.e(TAG, "Error: dispatchVOOOOO method not found.")
             }
 
         } catch (e: Throwable) {
