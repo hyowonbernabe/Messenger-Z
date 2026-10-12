@@ -71,6 +71,7 @@ their timestamp, so messages are keyed by `t<timestamp ms>`. Placeholder detecti
 | No Seen | `features/NoSeenFeature.kt` | `MailboxSDKJNI.dispatchVOOOOO`, arg[0] == id | `BLOCK_ID` | **88** (v582) |
 | No Typing | `features/NoTypingFeature.kt` | `MailboxSDKJNI.dispatchVOOOZ`, arg[0] == id | `TYPING_ID_SDK` | **96** (v582) |
 | No Story Seen | `features/NoStorySeenFeature.kt` | every implementation of the `(MontageCard, boolean)` mark-story-read interface (v582: `KMI` = MSYS, `MSB` = GraphQL `MontageMarkSeenMutation`), found via DexKit | anchor string `MontageMsysMarkReadHandler` | n/a (auto) |
+| Ghost exceptions | `core/GhostChats.kt` + `ui/GhostChatsDialog.kt` | chat token = first non-numeric String arg of the seen/typing dispatch; chat name from header label "`<name>, Thread details`" (MenuInjector); stories match `MontageCard`→`MontageUser` name | English header suffix | n/a |
 | Spoof Version | `features/SpoofVersionFeature.kt` | `ApplicationPackageManager.getPackageInfo` | none (stable) | n/a |
 | Message Logger | `features/MessageLoggerFeature.kt` + `core/MsysRows.kt` | `com.facebook.msys.mci.JQLResultSet.getString` (every chat bubble read) | none — text/time/name columns are **learned at runtime** per Messenger build (prefs key `logger_layouts_<versionCode>`) | auto |
 | Settings menu | `core/MenuInjector.kt` | `View.setContentDescription == "Messenger"` | the "Messenger" label | n/a |

@@ -1,6 +1,7 @@
 package com.messengerz.features
 
 import android.util.Log
+import com.messengerz.core.GhostChats
 import com.messengerz.core.Preferences
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
@@ -36,9 +37,10 @@ object NoTypingFeature {
                 val cmdId = param.args.getOrNull(0) as? Int ?: return
 
                 if (cmdId == TYPING_ID_SDK) {
-
-                    if (Preferences.isNoTypingEnabled) {
-                        Log.d(TAG, ">>> BLOCKED TYPING INDICATOR (ID: $TYPING_ID_SDK) <<<")
+                    val token = GhostChats.tokenOf(param.args)
+                    token?.let { GhostChats.remember(it) }
+                    if (Preferences.isNoTypingEnabled && GhostChats.appliesToToken(token)) {
+                        Log.d(TAG, ">>> BLOCKED TYPING INDICATOR (ID: $TYPING_ID_SDK) <<< args=" + param.args.drop(1).joinToString { DispatchProbe.describe(it) })
                         param.result = null
                     }
                 }

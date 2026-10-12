@@ -43,7 +43,8 @@ object DispatchProbe {
                         XposedBridge.hookMethod(m, object : XC_MethodHook() {
                             override fun beforeHookedMethod(param: MethodHookParam) {
                                 val id = param.args.getOrNull(0) as? Int
-                                if (toLogcat) Log.v(TAG, "dispatch $mname id=$id n=${param.args.size}")
+                                if (toLogcat) Log.v(TAG, "dispatch $mname id=$id n=${param.args.size}" +
+                                    if (cn.endsWith(".MailboxSDKJNI")) " args=" + param.args.drop(1).joinToString { a -> describe(a) } else "")
                                 if (!DebugLog.capturing) return
                                 DebugLog.add(mname, id, param.args.size)
                             }
@@ -58,6 +59,14 @@ object DispatchProbe {
         } catch (e: Throwable) {
             Log.e(TAG, "Error in DispatchProbe", e)
         }
+    }
+
+    /** Short arg summary for the probe log: class + value for boxed/primitive/string args. */
+    fun describe(a: Any?): String = when (a) {
+        null -> "null"
+        is Number, is Boolean -> "${a.javaClass.simpleName}:$a"
+        is String -> "\"${a.take(30)}\""
+        else -> a.javaClass.name.substringAfterLast('.') + "@" + a.toString().take(60).replace('\n', ' ')
     }
 
     private val MAILBOX_JNI = Regex("""com\.facebook\.[\w.]+\.mca\.Mailbox\w+JNI""")

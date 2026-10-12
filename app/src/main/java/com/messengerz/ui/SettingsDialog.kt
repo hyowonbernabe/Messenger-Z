@@ -93,6 +93,19 @@ object SettingsDialog {
             Preferences.isNoStorySeenEnabled
         ) { isChecked -> Preferences.setNoStorySeenEnabled(isChecked) }
 
+        // Who ghost mode applies to (per-chat exceptions)
+        val btnGhost = Button(context)
+        fun ghostLabel() = "Applies to: " + com.messengerz.core.GhostChats.mode.label
+        btnGhost.text = ghostLabel()
+        btnGhost.isAllCaps = false
+        btnGhost.setTextColor(COLOR_TEXT_PRIMARY)
+        btnGhost.textSize = 14f
+        btnGhost.background = GradientDrawable().apply { setColor(COLOR_DIVIDER); cornerRadius = dp(context, 50).toFloat() }
+        btnGhost.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            .apply { setMargins(0, dp(context, 4), 0, 0) }
+        btnGhost.setOnClickListener { GhostChatsDialog.show(context) { btnGhost.text = ghostLabel() } }
+        mainLayout.addView(btnGhost)
+
         addSpacer(context, mainLayout)
 
         // Spoof Version

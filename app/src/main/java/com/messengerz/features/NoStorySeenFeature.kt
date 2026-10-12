@@ -2,6 +2,7 @@ package com.messengerz.features
 
 import android.os.SystemClock
 import android.util.Log
+import com.messengerz.core.GhostChats
 import com.messengerz.core.Preferences
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
@@ -59,7 +60,12 @@ object NoStorySeenFeature {
                 XposedBridge.hookMethod(m, object : XC_MethodHook() {
                     override fun beforeHookedMethod(param: MethodHookParam) {
                         if (!Preferences.isNoStorySeenEnabled) return
-                        Log.d(TAG, ">>> BLOCKED STORY SEEN (${m.declaringClass.simpleName}.${m.name}) <<<")
+                        val owner = if (GhostChats.mode == GhostChats.Mode.EVERYONE) null else ownerName(param.args[0])
+                        if (!GhostChats.appliesToPerson(owner)) {
+                            Log.d(TAG, "Story seen allowed for '$owner' (ghost exception)")
+                            return
+                        }
+                        Log.d(TAG, ">>> BLOCKED STORY SEEN (${m.declaringClass.simpleName}.${m.name}) owner=$owner <<<")
                         param.result = null
                     }
                 })
@@ -70,4 +76,14 @@ object NoStorySeenFeature {
             Log.e(TAG, "Error initializing NoStorySeenFeature", e)
         }
     }
+
+    /** Story owner's display name: the MontageCard's MontageUser field, first readable String in it. */
+    private fun ownerName(card: Any?): String? = try {
+        val user = card?.javaClass?.declaredFields?.firstOrNull { it.type.simpleName == "MontageUser" }
+            ?.apply { isAccessible = true }?.get(card)
+        user?.javaClass?.declaredFields?.asSequence()
+            ?.filter { it.type == String::class.java }
+            ?.mapNotNull { f -> f.isAccessible = true; f.get(user) as String? }
+            ?.firstOrNull { s -> s.length in 2..80 && s.any(Char::isLetter) && !s.all { it.isDigit() } && !s.startsWith("http") }
+    } catch (e: Throwable) { null }
 }

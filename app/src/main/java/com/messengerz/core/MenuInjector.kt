@@ -23,6 +23,7 @@ object MenuInjector {
                     override fun afterHookedMethod(param: MethodHookParam) {
                         val desc = param.args[0]?.toString() ?: return
                         val view = param.thisObject as View
+                        GhostChats.onContentDescription(desc)
 
                         if (desc.equals("Messenger", ignoreCase = true)) {
                             attachListener(view, "Header")

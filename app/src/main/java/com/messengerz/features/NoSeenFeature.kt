@@ -1,6 +1,7 @@
 package com.messengerz.features
 
 import android.util.Log
+import com.messengerz.core.GhostChats
 import com.messengerz.core.Preferences
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
@@ -31,8 +32,10 @@ object NoSeenFeature {
                         val cmdId = param.args.getOrNull(0) as? Int ?: return
 
                         if (cmdId == BLOCK_ID) {
-                            if (Preferences.isNoSeenEnabled) {
-                                Log.d(TAG, ">>> BLOCKED SEEN INDICATOR (ID: $BLOCK_ID) <<<")
+                            val token = GhostChats.tokenOf(param.args)
+                            token?.let { GhostChats.remember(it) }
+                            if (Preferences.isNoSeenEnabled && GhostChats.appliesToToken(token)) {
+                                Log.d(TAG, ">>> BLOCKED SEEN INDICATOR (ID: $BLOCK_ID) <<< args=" + param.args.drop(1).joinToString { DispatchProbe.describe(it) })
                                 param.result = null
                             }
                         }
