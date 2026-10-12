@@ -108,6 +108,15 @@ object SettingsDialog {
 
         addSpacer(context, mainLayout)
 
+        // Link cleaning
+        addSwitchRow(context, mainLayout,
+            Global.CLEAN_LINKS_TITLE,
+            Global.CLEAN_LINKS_DESC,
+            Preferences.isCleanLinksEnabled
+        ) { isChecked -> Preferences.setCleanLinksEnabled(isChecked) }
+
+        addSpacer(context, mainLayout)
+
         // Spoof Version
         addSwitchRow(context, mainLayout,
             Global.SPOOF_VERSION_FEATURE_TITLE,

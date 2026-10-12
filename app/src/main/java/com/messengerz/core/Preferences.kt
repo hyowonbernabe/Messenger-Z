@@ -37,6 +37,14 @@ object Preferences {
         prefs?.edit()?.putBoolean("pref_no_story_seen", enabled)?.apply()
     }
 
+    // --- LINK CLEANING ---
+    val isCleanLinksEnabled: Boolean
+        get() = prefs?.getBoolean("pref_clean_links", true) ?: true
+
+    fun setCleanLinksEnabled(enabled: Boolean) {
+        prefs?.edit()?.putBoolean("pref_clean_links", enabled)?.apply()
+    }
+
     // --- SPOOF VERSION ---
     val isSpoofVersionEnabled: Boolean
         get() = prefs?.getBoolean("pref_spoof_version", false) ?: false
