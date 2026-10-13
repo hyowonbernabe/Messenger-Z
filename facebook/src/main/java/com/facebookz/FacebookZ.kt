@@ -30,6 +30,7 @@ class FacebookZ : IXposedHookLoadPackage {
             DexKitBridge.create(lpparam.appInfo.sourceDir).use { bridge ->
                 Stories.init(bridge, lpparam.classLoader)
                 AppearOffline.init(bridge, lpparam.classLoader)
+                FeedAds.init(bridge, lpparam.classLoader)
             }
             Log.d(TAG, "Hooks ready in ${SystemClock.elapsedRealtime() - t0} ms")
         } catch (e: Throwable) {
