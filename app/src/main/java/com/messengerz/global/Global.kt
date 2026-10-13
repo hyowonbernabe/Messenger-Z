@@ -1,7 +1,7 @@
 package com.messengerz.global
 
 object Global {
-    const val VERSION = "v1.9.0"
+    val VERSION = "v" + com.messengerz.BuildConfig.VERSION_NAME
     const val MESSENGER_Z_TITLE = "Messenger Z"
     const val MESSENGER_Z_AUTHOR = "Created by Hyowon Bernabe"
     const val MESSENGER_Z_GITHUB = "https://github.com/hyowonbernabe/Messenger-Z"
