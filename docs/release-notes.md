@@ -33,7 +33,12 @@ The unsent message log recognizes English Messenger only. Unsent photos and vide
 # Facebook Z
 
 Patched Facebook, same approach. It replaces the Facebook app and picks up your account from
-Messenger Z automatically. Open settings by long-pressing the **facebook** logo at the top of the feed.
+Messenger Z automatically.
+
+**Opening Facebook Z settings:** long-press the **facebook** logo at the top of the **Home** (feed) screen.
+If Facebook opens on Reels or another tab instead, the logo won't open the settings. Long-press the
+feed tab (the newspaper icon) and choose to make it your start screen, then tap it so the feed is
+your home screen again. After that, long-pressing the **facebook** logo opens the settings.
 
 ### 📖 Stories
 - **Hide story views**: watch stories without appearing in the viewer list.
