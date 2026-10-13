@@ -14,6 +14,7 @@ object FeatureManager {
         NoTypingFeature.init(lpparam)
         NoStorySeenFeature.init(lpparam)
         com.messengerz.features.StoryControlsFeature.init(lpparam)
+        com.messengerz.features.StoryDownloadFeature.init(lpparam)
         SpoofVersionFeature.init(lpparam)
         com.messengerz.features.CleanLinksFeature.init(lpparam)
         com.messengerz.features.AppearOfflineFeature.init(lpparam)

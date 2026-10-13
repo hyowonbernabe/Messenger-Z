@@ -13,6 +13,8 @@ object Global {
     const val NO_TYPING_FEATURE_DESC = "Hide the typing animation while you write."
     const val STORY_AUTOSWIPE_TITLE = "Stop Story Auto-Swipe"
     const val STORY_AUTOSWIPE_DESC = "Stay on each story until you tap to move on."
+    const val STORY_DOWNLOAD_TITLE = "Story Download Button"
+    const val STORY_DOWNLOAD_DESC = "Show a ⬇ button in stories to save them to Downloads."
     const val APPEAR_OFFLINE_TITLE = "Appear Offline"
     const val APPEAR_OFFLINE_DESC = "Hide your \"Active now\" while still seeing others. Restart Messenger to apply."
     const val CLEAN_LINKS_TITLE = "Remove Link Tracking"

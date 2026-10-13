@@ -87,6 +87,7 @@ object SettingsDialog {
         // --- Stories ---
         section(context, content, "Stories").apply {
             switchRow(context, this, Global.STORY_AUTOSWIPE_TITLE, Global.STORY_AUTOSWIPE_DESC, Preferences.isStoryAutoSwipeDisabled) { Preferences.setStoryAutoSwipeDisabled(it) }
+            switchRow(context, this, Global.STORY_DOWNLOAD_TITLE, Global.STORY_DOWNLOAD_DESC, Preferences.isStoryDownloadEnabled) { Preferences.setStoryDownloadEnabled(it) }
         }
 
         // --- Links & presence ---

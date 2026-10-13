@@ -45,6 +45,13 @@ object Preferences {
         prefs?.edit()?.putBoolean("pref_story_no_autoswipe", enabled)?.apply()
     }
 
+    val isStoryDownloadEnabled: Boolean
+        get() = prefs?.getBoolean("pref_story_download", true) ?: true
+
+    fun setStoryDownloadEnabled(enabled: Boolean) {
+        prefs?.edit()?.putBoolean("pref_story_download", enabled)?.apply()
+    }
+
     // --- APPEAR OFFLINE ---
     val isAppearOfflineEnabled: Boolean
         get() = prefs?.getBoolean("pref_appear_offline", false) ?: false
