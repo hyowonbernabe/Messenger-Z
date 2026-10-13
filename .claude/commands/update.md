@@ -105,13 +105,13 @@ Also confirm the Message Logger line `CAPTURED: 'mz seen test …'` appeared in 
 ## 7. Publish (only if both tests passed)
 1. Commit (conventional message, e.g. `fix: retarget hooks for Messenger $V`) and `git push`.
 2. `cp dist/*-lspatched.apk MessengerZ-$V.apk`, `cp dist-fb/*-lspatched.apk FacebookZ-$FV.apk`.
-   `MODVER` / `FBMODVER` = versionName from `app/build.gradle.kts` / `facebook/build.gradle.kts`.
-3. Notes file: one line "Messenger Z $MODVER (Messenger $V) and Facebook Z $FBMODVER (Facebook $FV),
+   `MODVER` = `zVersion` in `gradle.properties` (one version for both apps).
+3. Notes file: one line "Messenger Z + Facebook Z $MODVER (Messenger $V, Facebook $FV),
    verified on an emulator", then `docs/release-notes.md` (it lists **every** feature of both apps —
    keep it current; mark anything new with "(new)"). No pre-release warning.
 4. If `v$V` exists (CI makes biweekly pre-releases): `gh release upload v$V MessengerZ-$V.apk FacebookZ-$FV.apk --clobber`,
    `gh release edit v$V --notes-file <notes> --prerelease=false --latest`. Otherwise
-   `gh release create v$V MessengerZ-$V.apk FacebookZ-$FV.apk --latest --title "Messenger Z $MODVER + Facebook Z $FBMODVER" --notes-file <notes>`.
+   `gh release create v$V MessengerZ-$V.apk FacebookZ-$FV.apk --latest --title "Messenger Z + Facebook Z $MODVER" --notes-file <notes>`.
    Both APKs always go in the same release.
 5. Delete the local APK copies and tell the user the release link.
 

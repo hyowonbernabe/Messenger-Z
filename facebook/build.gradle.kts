@@ -11,8 +11,8 @@ android {
         applicationId = "com.facebookz"
         minSdk = 26
         targetSdk = 36
-        versionCode = (project.findProperty("verCode") as String?)?.toIntOrNull() ?: 100
-        versionName = "1.0.0"
+        versionCode = (project.findProperty("verCode") as String?)?.toIntOrNull() ?: (project.property("zVersionCode") as String).toInt()
+        versionName = project.property("zVersion") as String
         // Facebook base version this build is patched onto (CI passes -PfbVer).
         buildConfigField("String", "FACEBOOK_VER", "\"${(project.findProperty("fbVer") as String?) ?: "dev"}\"")
     }

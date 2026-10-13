@@ -87,10 +87,9 @@ jobs:
         run: |
           V="${{ steps.ver.outputs.version }}"
           FV="${{ steps.ver.outputs.fbversion }}"
-          MODVER=$(grep -oE 'versionName = "[^"]*"' app/build.gradle.kts | grep -oE '[0-9][0-9.]*' | head -1)
-          FBMODVER=$(grep -oE 'versionName = "[^"]*"' facebook/build.gradle.kts | grep -oE '[0-9][0-9.]*' | head -1)
+          MODVER=$(grep -oE '^zVersion=.*' gradle.properties | cut -d= -f2)
           {
-            echo "**Messenger Z ${MODVER}** (Messenger ${V}) and **Facebook Z ${FBMODVER}** (Facebook ${FV})."
+            echo "**Messenger Z + Facebook Z ${MODVER}**, patched onto Messenger ${V} and Facebook ${FV}."
             echo ""
             echo "> ⚠️ **Pre-release.** This is an automated build that hasn't been manually checked yet. If Messenger or Facebook changed internally since the last update, some features may not work until a fix ships. A confirmed-working build is published as the latest (non-pre-release) version."
             echo ""
@@ -100,7 +99,7 @@ jobs:
             gh release upload "v$V" "MessengerZ-$V.apk" "FacebookZ-$FV.apk" --clobber
           else
             gh release create "v$V" "MessengerZ-$V.apk" "FacebookZ-$FV.apk" \
-              --title "Messenger Z ${MODVER} + Facebook Z ${FBMODVER}" \
+              --title "Messenger Z + Facebook Z ${MODVER}" \
               --prerelease \
               --notes-file notes.md
           fi
