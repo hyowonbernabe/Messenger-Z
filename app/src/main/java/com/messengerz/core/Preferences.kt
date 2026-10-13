@@ -37,6 +37,14 @@ object Preferences {
         prefs?.edit()?.putBoolean("pref_no_story_seen", enabled)?.apply()
     }
 
+    // --- STORIES ---
+    val isStoryAutoSwipeDisabled: Boolean
+        get() = prefs?.getBoolean("pref_story_no_autoswipe", false) ?: false
+
+    fun setStoryAutoSwipeDisabled(enabled: Boolean) {
+        prefs?.edit()?.putBoolean("pref_story_no_autoswipe", enabled)?.apply()
+    }
+
     // --- APPEAR OFFLINE ---
     val isAppearOfflineEnabled: Boolean
         get() = prefs?.getBoolean("pref_appear_offline", false) ?: false

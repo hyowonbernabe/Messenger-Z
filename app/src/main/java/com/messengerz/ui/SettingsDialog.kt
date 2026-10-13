@@ -84,6 +84,11 @@ object SettingsDialog {
             actionRow(context, this, "Unsent & edited messages", "Open the log") { MessageLogDialog.show(context) }
         }
 
+        // --- Stories ---
+        section(context, content, "Stories").apply {
+            switchRow(context, this, Global.STORY_AUTOSWIPE_TITLE, Global.STORY_AUTOSWIPE_DESC, Preferences.isStoryAutoSwipeDisabled) { Preferences.setStoryAutoSwipeDisabled(it) }
+        }
+
         // --- Links & presence ---
         section(context, content, "Links & presence").apply {
             switchRow(context, this, Global.CLEAN_LINKS_TITLE, Global.CLEAN_LINKS_DESC, Preferences.isCleanLinksEnabled) { Preferences.setCleanLinksEnabled(it) }

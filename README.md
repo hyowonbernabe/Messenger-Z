@@ -18,6 +18,7 @@ indicators, watch stories anonymously, recover unsent messages) and **installs a
 *   **👻 No Seen** — read messages without sending the read receipt.
 *   **⌨️ No Typing** — hide the "…" typing indicator while you write.
 *   **🕶️ No Story Seen** — watch stories without appearing in the viewer list.
+*   **⏸️ Stop Story Auto-Swipe** — stay on each story until you tap.
 *   **🌙 Appear Offline** — stop showing "Active now" while still seeing who else is active (off by default).
 *   **🔗 Remove Link Tracking** — links open without Facebook's redirect wrapper or `fbclid`/`utm_*` tags.
 *   **🎯 Per-chat ghost mode** — apply seen/typing/story hiding to everyone, everyone except chosen chats, or only chosen chats.
