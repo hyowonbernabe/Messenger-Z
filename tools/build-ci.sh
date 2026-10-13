@@ -12,7 +12,8 @@
 # Usage: build-ci.sh <messenger-stock.apk> <module.apk> <out-dir>
 # Prints the final lspatched APK path on the last line.
 #
-# Env overrides: PYTHON (default python3). `java` must be on PATH.
+# Env overrides: PYTHON (default python3), SIGBYPASS (LSPatch signature-bypass level, default 2;
+# Facebook needs 1: level 2's native file-redirect hooks crash Facebook's startup threads). `java` must be on PATH.
 set -euo pipefail
 
 MESSENGER_APK="${1:?usage: build-ci.sh <messenger.apk> <module.apk> <outdir>}"
@@ -60,7 +61,7 @@ SIGNED_APK="$(ls "$SIGNED_DIR"/*.apk | head -1)"
 [ -f "$SIGNED_APK" ] || { echo "no signed apk produced" >&2; exit 1; }
 
 echo "[5/5] LSPatch embed module"
-java -jar "$LSPATCH" "$SIGNED_APK" -m "$MODULE_APK" -f -l 2 -o "$OUT_DIR" -v
+java -jar "$LSPATCH" "$SIGNED_APK" -m "$MODULE_APK" -f -l "${SIGBYPASS:-2}" -o "$OUT_DIR" -v
 
 FINAL="$(ls -t "$OUT_DIR"/*lspatched.apk 2>/dev/null | head -1)"
 [ -f "$FINAL" ] || { echo "lspatch produced no output" >&2; exit 1; }

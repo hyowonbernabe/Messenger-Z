@@ -24,12 +24,17 @@ used for testing.
 
 ```
 ./gradlew :facebook:assembleDebug -PfbVer=<ver>
-WORK=$PWD/tools/work-fb PYTHON=python bash tools/build-ci.sh base/facebook-<ver>.apk \
+WORK=$PWD/tools/work-fb SIGBYPASS=1 PYTHON=python bash tools/build-ci.sh base/facebook-<ver>.apk \
     facebook/build/outputs/apk/debug/facebook-debug.apk dist-fb
 ```
 
 `WORK` keeps the Facebook build from wiping Messenger's intermediate files (`build-ci.sh`
 deletes its work folder at the start).
+
+`SIGBYPASS=1` is required. LSPatch's default level 2 adds native file-redirect hooks that make
+Facebook's startup threads crash at random (SIGSEGV in `HybridData.<init>`, then Facebook's own
+crash reporter deadlocks and the app hangs on the splash screen) — even with zero module hooks.
+Level 1 (Java-only signature spoof) is stable and shared login still works.
 
 ## Coexisting with other Meta apps
 
