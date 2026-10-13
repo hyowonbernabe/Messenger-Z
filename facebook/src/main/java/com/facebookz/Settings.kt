@@ -45,7 +45,7 @@ object Settings {
         SettingsKit.show(context, "Facebook Z", "v${BuildConfig.VERSION_NAME}  ·  Facebook ${BuildConfig.FACEBOOK_VER}", footer) { content, _ ->
             context.flags(section(context, content, "Stories"), Prefs.NO_STORY_SEEN, Prefs.NO_AUTOSWIPE, Prefs.STORY_DOWNLOAD)
             context.flags(section(context, content, "Ads"), Prefs.NO_FEED_ADS, Prefs.NO_STORY_ADS)
-            context.flags(section(context, content, "Privacy"), Prefs.APPEAR_OFFLINE, Prefs.CLEAR_SEARCH)
+            context.flags(section(context, content, "Privacy"), Prefs.APPEAR_OFFLINE)
             section(context, content, "Tools").apply {
                 actionRow(context, this, "Restart Facebook", "Apply changes that need a restart") { AppControl.restart(context) }
                 actionRow(context, this, "Clear Facebook cache", "Free space used by cached media") {

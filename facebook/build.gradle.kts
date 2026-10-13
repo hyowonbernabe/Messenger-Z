@@ -12,7 +12,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = (project.findProperty("verCode") as String?)?.toIntOrNull() ?: 100
-        versionName = "0.1.0"
+        versionName = "1.0.0"
         // Facebook base version this build is patched onto (CI passes -PfbVer).
         buildConfigField("String", "FACEBOOK_VER", "\"${(project.findProperty("fbVer") as String?) ?: "dev"}\"")
     }

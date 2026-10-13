@@ -23,5 +23,4 @@ object Prefs {
     val APPEAR_OFFLINE = Flag("appear_offline", false, "Appear Offline", "Hide your \"Active now\" while still seeing others. Restart Facebook to apply.")
     val NO_FEED_ADS = Flag("no_feed_ads", true, "Hide Sponsored Posts", "Remove ads from your feed.")
     val NO_STORY_ADS = Flag("no_story_ads", true, "Hide Story Ads", "Skip ads between stories.")
-    val CLEAR_SEARCH = Flag("clear_search", false, "Auto-Clear Search History", "Forget your searches every time Facebook starts.")
 }

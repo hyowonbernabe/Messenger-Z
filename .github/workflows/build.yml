@@ -1,4 +1,4 @@
-name: Build Messenger Z
+name: Build Messenger Z + Facebook Z
 
 on:
   schedule:
@@ -28,12 +28,14 @@ jobs:
       - name: Make scripts executable
         run: chmod +x ./gradlew tools/*.sh
 
-      - name: Determine latest Messenger version
+      - name: Determine latest Messenger and Facebook versions
         id: ver
         run: |
           V=$(bash tools/fetch-messenger.sh version)
+          FV=$(bash tools/fetch-facebook.sh version)
           echo "version=$V" >> "$GITHUB_OUTPUT"
-          echo "Latest stable Messenger: $V"
+          echo "fbversion=$FV" >> "$GITHUB_OUTPUT"
+          echo "Latest stable Messenger: $V, Facebook: $FV"
 
       - name: Decide whether to build
         id: gate
@@ -41,25 +43,30 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           V="${{ steps.ver.outputs.version }}"
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && gh release view "v$V" >/dev/null 2>&1; then
+          FV="${{ steps.ver.outputs.fbversion }}"
+          # One release per Messenger version (tag v$V); a new Facebook version rebuilds it.
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && gh release view "v$V" --json assets -q '.assets[].name' 2>/dev/null | grep -qx "FacebookZ-$FV.apk"; then
             echo "build=false" >> "$GITHUB_OUTPUT"
-            echo "Release v$V already exists; nothing new to build."
+            echo "Release v$V already has Messenger $V + Facebook $FV; nothing new to build."
           else
             echo "build=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Download stock Messenger
+      - name: Download stock Messenger and Facebook
         if: steps.gate.outputs.build == 'true'
-        run: bash tools/fetch-messenger.sh download messenger.apk
+        run: |
+          bash tools/fetch-messenger.sh download messenger.apk
+          bash tools/fetch-facebook.sh download facebook.apk
 
-      - name: Build Messenger Z module
+      - name: Build Messenger Z and Facebook Z modules
         if: steps.gate.outputs.build == 'true'
         env:
           RUN_NUMBER: ${{ github.run_number }}
           MSGR_VER: ${{ steps.ver.outputs.version }}
+          FB_VER: ${{ steps.ver.outputs.fbversion }}
         run: |
           VER_CODE=$((11000 + RUN_NUMBER))
-          ./gradlew :messenger:assembleDebug -PverCode="$VER_CODE" -PmsgrVer="$MSGR_VER" --console=plain
+          ./gradlew :messenger:assembleDebug :facebook:assembleDebug -PverCode="$VER_CODE" -PmsgrVer="$MSGR_VER" -PfbVer="$FB_VER" --console=plain
 
       - name: Patch (strip perms + sign + LSPatch embed)
         if: steps.gate.outputs.build == 'true'
@@ -68,7 +75,10 @@ jobs:
           V="${{ steps.ver.outputs.version }}"
           OUT=$(ls dist/*lspatched.apk | head -1)
           cp "$OUT" "MessengerZ-$V.apk"
-          echo "Built MessengerZ-$V.apk"
+          FV="${{ steps.ver.outputs.fbversion }}"
+          WORK=$PWD/tools/work-fb SIGBYPASS=1 bash tools/build-ci.sh facebook.apk facebook/build/outputs/apk/debug/facebook-debug.apk dist-fb
+          cp "$(ls dist-fb/*lspatched.apk | head -1)" "FacebookZ-$FV.apk"
+          echo "Built MessengerZ-$V.apk and FacebookZ-$FV.apk"
 
       - name: Publish prerelease
         if: steps.gate.outputs.build == 'true'
@@ -76,21 +86,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           V="${{ steps.ver.outputs.version }}"
+          FV="${{ steps.ver.outputs.fbversion }}"
           MODVER=$(grep -oE 'versionName = "[^"]*"' app/build.gradle.kts | grep -oE '[0-9][0-9.]*' | head -1)
-          NOTES="**Messenger Z ${MODVER}** — patched onto Messenger ${V}. Non-root; installs alongside the Facebook app.
-
-          > ⚠️ **Pre-release.** This is an automated build that hasn't been manually checked yet. If Messenger changed internally since the last update, some features may not work until a fix ships. A confirmed-working build is published as the latest (non-pre-release) version.
-
-          **Features:** hide seen indicator, hide typing indicator, anonymous story viewing, log unsent messages, version spoof.
-
-          Open settings by long-pressing the **Messenger** title."
+          FBMODVER=$(grep -oE 'versionName = "[^"]*"' facebook/build.gradle.kts | grep -oE '[0-9][0-9.]*' | head -1)
+          {
+            echo "**Messenger Z ${MODVER}** (Messenger ${V}) and **Facebook Z ${FBMODVER}** (Facebook ${FV})."
+            echo ""
+            echo "> ⚠️ **Pre-release.** This is an automated build that hasn't been manually checked yet. If Messenger or Facebook changed internally since the last update, some features may not work until a fix ships. A confirmed-working build is published as the latest (non-pre-release) version."
+            echo ""
+            cat docs/release-notes.md
+          } > notes.md
           if gh release view "v$V" >/dev/null 2>&1; then
-            gh release upload "v$V" "MessengerZ-$V.apk" --clobber
+            gh release upload "v$V" "MessengerZ-$V.apk" "FacebookZ-$FV.apk" --clobber
           else
-            gh release create "v$V" "MessengerZ-$V.apk" \
-              --title "Messenger Z ${MODVER} (Messenger ${V})" \
+            gh release create "v$V" "MessengerZ-$V.apk" "FacebookZ-$FV.apk" \
+              --title "Messenger Z ${MODVER} + Facebook Z ${FBMODVER}" \
               --prerelease \
-              --notes "$NOTES"
+              --notes-file notes.md
           fi
 
       - name: Maintainer reminder (internal, not shown to users)
@@ -99,7 +111,7 @@ jobs:
           {
             echo "### Prerelease v${{ steps.ver.outputs.version }} published"
             echo ""
-            echo "**Before promoting:** install, open the Debug Console, confirm No Seen and No Typing still fire."
+            echo "**Before promoting:** run /update (it verifies both apps on the emulator), or at least install, open the Debug Console, confirm No Seen and No Typing still fire, and check Facebook Z's startup log (story seen / progress / ads hooks found)."
             echo "Expected command ids live in \`docs/messenger/hook-ids.md\`. If a hook is dead, the id drifted — re-capture via the console (see \`docs/messenger/maintenance.md\`), update the constant, and re-run."
             echo ""
             echo "Then edit the release and uncheck **pre-release** to ship it to Obtainium."

@@ -1,13 +1,13 @@
 ---
-description: Rebase Messenger Z onto the newest Messenger, verify No Seen / No Typing on the emulator, and publish a full release
+description: Rebase Messenger Z and Facebook Z onto the newest Messenger / Facebook, verify them on the emulator, and publish one joint release
 ---
 
-Fully update Messenger Z to the latest Messenger and ship it. Work autonomously; only stop to ask
+Fully update Messenger Z and Facebook Z to the latest Messenger / Facebook and ship both in one release. Work autonomously; only stop to ask
 if a step below says so. Talk to the user in plain language (see global CLAUDE.md).
 
 Read `.claude/update.local.md` first (gitignored): it holds the friend chat URL, the chat title
 as shown on the emulator, and the AVD name. If it is missing, ask the user for those values and
-create it. Background: `docs/messenger/maintenance.md`, `docs/messenger/hook-ids.md`.
+create it. Background: `docs/messenger/maintenance.md`, `docs/messenger/hook-ids.md`, `docs/facebook/maintenance.md`.
 
 Paths used below: `ADB=$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`,
 `EMU=$LOCALAPPDATA/Android/Sdk/emulator/emulator.exe`, JDK = `/c/Program Files/Android/Android Studio/jbr`
@@ -15,8 +15,9 @@ Paths used below: `ADB=$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`,
 
 ## 1. Sync and check for a new version
 1. `git pull --ff-only` on `main`. Stop and tell the user if the tree is dirty or it can't fast-forward.
-2. `V=$(bash tools/fetch-messenger.sh version)`. If `gh release view v$V` exists **and is not a
-   pre-release**, tell the user it's already up to date and stop (unless they asked to force).
+2. `V=$(bash tools/fetch-messenger.sh version)`, `FV=$(bash tools/fetch-facebook.sh version)`. If
+   `gh release view v$V` exists, **is not a pre-release** and already has `FacebookZ-$FV.apk`, tell the
+   user it's already up to date and stop (unless they asked to force).
 
 ## 2. Build
 1. `bash tools/fetch-messenger.sh download base/messenger-$V.apk` (`*.apk` is gitignored).
@@ -24,6 +25,10 @@ Paths used below: `ADB=$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`,
 3. `PYTHON=python bash tools/build-ci.sh base/messenger-$V.apk app/build/outputs/apk/debug/messenger-debug.apk dist`
    (JDK `bin` on PATH). Output: `dist/*-lspatched.apk`.
    `tools/lspatch/lspatch.jar` must stay the LSPatch v1.2 + PR #121 build (see maintenance.md §4.1).
+4. Facebook: `bash tools/fetch-facebook.sh download base/facebook-$FV.apk`,
+   `./gradlew :facebook:assembleDebug -PfbVer=$FV`, then
+   `WORK=$PWD/tools/work-fb SIGBYPASS=1 PYTHON=python bash tools/build-ci.sh base/facebook-$FV.apk facebook/build/outputs/apk/debug/facebook-debug.apk dist-fb`.
+   `SIGBYPASS=1` is required (level 2 makes Facebook crash/hang at startup).
 
 ## 3. Boot the emulator and install
 1. Launch with the Bash tool's `run_in_background` (nohup/Start-Process die with the shell):
@@ -41,6 +46,21 @@ Paths used below: `ADB=$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`,
    emulator with a window for that), then continue.
 6. Dismiss prompts (notification permission → "Don't allow", nux screens → "Not now"/Back).
    Find buttons with `uiautomator dump /sdcard/ui.xml` + `cat`, never guess coordinates.
+
+## 3b. Facebook Z
+1. `adb install -r dist-fb/*-lspatched.apk`, grant notifications
+   (`adb shell pm grant com.facebook.katana android.permission.POST_NOTIFICATIONS`), launch with
+   `monkey -p com.facebook.katana`. It signs in by itself through Messenger's shared login.
+2. Startup log (`grep FacebookZ`) must show: `Story seen: hooked 1 sender(s)`, `Story progress hooked`,
+   `AppearOffline hooked`, `Feed ads: hooked N insert check(s) + M vend(s)` (N, M ≥ 1), `Hooks ready`.
+   A "not found" line means the anchor string moved — see `docs/facebook/maintenance.md` (hook map).
+3. Stories: open **only the user's own story** (find "<user name>'s story" in the tray with
+   `uiautomator`, scroll the tray with swipes, never tap other people's stories). Wait 20 s.
+   **Pass** = the story does not advance by itself if "Stop auto-swipe" is on (set it in the settings,
+   long-press the facebook logo), the ⬇ button saves a file to `/sdcard/Download/FacebookZ/`, and after
+   closing the log shows `BLOCKED STORY SEEN`.
+4. Feed: scroll ~30 times. **Pass** = `BLOCKED AD` lines in the log, posts keep loading (feed not stuck
+   on grey placeholders) and no ad buttons ("Learn more", "Shop now", "Install now") in `uiautomator` dumps.
 
 ## 4. Test No Seen (friend = the user's browser account via claude-in-chrome)
 Order matters — the log must contain only the one action:
@@ -84,14 +104,16 @@ Also confirm the Message Logger line `CAPTURED: 'mz seen test …'` appeared in 
 
 ## 7. Publish (only if both tests passed)
 1. Commit (conventional message, e.g. `fix: retarget hooks for Messenger $V`) and `git push`.
-2. `cp dist/*-lspatched.apk MessengerZ-$V.apk`. `MODVER` = versionName from `app/build.gradle.kts`.
-3. If `v$V` exists (CI makes biweekly pre-releases): `gh release upload v$V MessengerZ-$V.apk --clobber`
-   then `gh release edit v$V --prerelease=false --latest`. Otherwise
-   `gh release create v$V MessengerZ-$V.apk --latest --title "Messenger Z $MODVER (Messenger $V)" --notes …`.
-   Notes: one line saying it's patched onto Messenger $V and was verified on an emulator
-   (seen, typing and story seen blocked), the feature list, and "Open settings by long-pressing the Messenger title."
-   No pre-release warning.
-4. Delete the local `MessengerZ-$V.apk` copy and tell the user the release link.
+2. `cp dist/*-lspatched.apk MessengerZ-$V.apk`, `cp dist-fb/*-lspatched.apk FacebookZ-$FV.apk`.
+   `MODVER` / `FBMODVER` = versionName from `app/build.gradle.kts` / `facebook/build.gradle.kts`.
+3. Notes file: one line "Messenger Z $MODVER (Messenger $V) and Facebook Z $FBMODVER (Facebook $FV),
+   verified on an emulator", then `docs/release-notes.md` (it lists **every** feature of both apps —
+   keep it current; mark anything new with "(new)"). No pre-release warning.
+4. If `v$V` exists (CI makes biweekly pre-releases): `gh release upload v$V MessengerZ-$V.apk FacebookZ-$FV.apk --clobber`,
+   `gh release edit v$V --notes-file <notes> --prerelease=false --latest`. Otherwise
+   `gh release create v$V MessengerZ-$V.apk FacebookZ-$FV.apk --latest --title "Messenger Z $MODVER + Facebook Z $FBMODVER" --notes-file <notes>`.
+   Both APKs always go in the same release.
+5. Delete the local APK copies and tell the user the release link.
 
 If any test can't be made to pass, do **not** publish. Commit nothing that's unverified; report
 what was found (log lines, screenshots) and ask the user.

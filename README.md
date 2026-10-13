@@ -109,10 +109,12 @@ matching `features/*.kt`, and log it in `docs/messenger/hook-ids.md`.
 
 ## 📘 Also in this repo: Facebook Z
 
-**Facebook Z** applies the same approach to the Facebook app (`com.facebook.katana`), focused on
-stories: hide story views, stop auto-swipe, story download, appear offline, no ads, and
-auto-clearing search history. It ships in the **same release** as Messenger Z (separate
-`FacebookZ-*.apk` file). It is in early development; see [`docs/facebook/maintenance.md`](docs/facebook/maintenance.md).
+**Facebook Z** applies the same approach to the Facebook app (`com.facebook.katana`): hide story
+views, stop story auto-swipe, story download, skip story ads, hide sponsored posts in the feed, and
+appear offline. Open its settings by long-pressing the **facebook** logo. It ships in the **same
+release** as Messenger Z (separate `FacebookZ-*.apk` file), replaces the Facebook app, and signs in
+through Messenger Z automatically. Full feature list of both apps: [`docs/release-notes.md`](docs/release-notes.md);
+maintenance: [`docs/facebook/maintenance.md`](docs/facebook/maintenance.md).
 
 Repo layout:
 
