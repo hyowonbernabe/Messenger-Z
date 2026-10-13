@@ -56,7 +56,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     // Added
-    compileOnly(files("libs/api-82.jar"))
+    implementation(project(":shared"))
+    compileOnly(files("../shared/libs/api-82.jar"))
     implementation(libs.dexkit) // finds obfuscated Messenger methods by string/signature at runtime
     runtimeOnly(libs.androidx.preference.ktx)
 }

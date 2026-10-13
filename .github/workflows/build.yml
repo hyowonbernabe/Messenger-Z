@@ -59,12 +59,12 @@ jobs:
           MSGR_VER: ${{ steps.ver.outputs.version }}
         run: |
           VER_CODE=$((11000 + RUN_NUMBER))
-          ./gradlew :app:assembleDebug -PverCode="$VER_CODE" -PmsgrVer="$MSGR_VER" --console=plain
+          ./gradlew :messenger:assembleDebug -PverCode="$VER_CODE" -PmsgrVer="$MSGR_VER" --console=plain
 
       - name: Patch (strip perms + sign + LSPatch embed)
         if: steps.gate.outputs.build == 'true'
         run: |
-          bash tools/build-ci.sh messenger.apk app/build/outputs/apk/debug/app-debug.apk dist
+          bash tools/build-ci.sh messenger.apk app/build/outputs/apk/debug/messenger-debug.apk dist
           V="${{ steps.ver.outputs.version }}"
           OUT=$(ls dist/*lspatched.apk | head -1)
           cp "$OUT" "MessengerZ-$V.apk"
@@ -100,7 +100,7 @@ jobs:
             echo "### Prerelease v${{ steps.ver.outputs.version }} published"
             echo ""
             echo "**Before promoting:** install, open the Debug Console, confirm No Seen and No Typing still fire."
-            echo "Expected command ids live in \`docs/hook-ids.md\`. If a hook is dead, the id drifted — re-capture via the console (see \`docs/maintenance.md\`), update the constant, and re-run."
+            echo "Expected command ids live in \`docs/messenger/hook-ids.md\`. If a hook is dead, the id drifted — re-capture via the console (see \`docs/messenger/maintenance.md\`), update the constant, and re-run."
             echo ""
             echo "Then edit the release and uncheck **pre-release** to ship it to Obtainium."
           } >> "$GITHUB_STEP_SUMMARY"

@@ -35,3 +35,9 @@ local.properties
 
 # Local-only /update test config (private chat link etc.)
 /.claude/*.local.*
+*.xapk
+/dist-fb/
+/tools/work-fb/
+
+# Module build outputs
+**/build/

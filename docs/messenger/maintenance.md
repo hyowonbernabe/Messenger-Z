@@ -101,7 +101,7 @@ so you do not have to decompile by hand.
    the script's autodetect expects exactly one.
 2. Build the module:
    ```
-   ./gradlew :app:assembleDebug
+   ./gradlew :messenger:assembleDebug
    ```
    Use **JDK 21** (`tools/lspatch/lspatch.jar` rejects newer JDKs). The Android Studio JBR
    at `…/Android Studio/jbr` is 21 — point `JAVA_HOME` at it.
@@ -174,7 +174,7 @@ offending permission — add it to `$ConflictingPermissions` in the script.
 
 | Stage | Tool | Why |
 |---|---|---|
-| Build module | Gradle (`:app:assembleDebug`) | produces `app/build/outputs/apk/debug/app-debug.apk` |
+| Build module | Gradle (`:messenger:assembleDebug`) | produces `app/build/outputs/apk/debug/messenger-debug.apk` |
 | Decode Messenger | APKEditor (`-t xml -dex`) | ARSCLib, avoids aapt2 (Meta APKs use resource names aapt2 rejects); `-dex` keeps dex bytes byte-identical so native integrity checks don't trip |
 | Strip permissions | regex on `AndroidManifest.xml` | fixes the coexistence collision (§5) |
 | Rebuild | APKEditor `b` | unsigned APK |

@@ -20,5 +20,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "MessengerZ"
-include(":app")
- 
+include(":messenger")
+project(":messenger").projectDir = file("app") // TEMP until app/ can be renamed (VS Code holds a lock)
+include(":facebook")
+ include(":shared")

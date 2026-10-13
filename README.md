@@ -60,7 +60,7 @@ indicators, watch stories anonymously, recover unsent messages) and **installs a
 Builds are produced by GitHub Actions (`.github/workflows/build.yml`): every two weeks
 (1st/15th) and on manual dispatch, it detects the latest stable Messenger, patches it, and
 publishes a **pre-release**. A maintainer verifies the hooks (via the Debug Console) and
-un-marks it as pre-release to ship. See [`docs/maintenance.md`](docs/maintenance.md).
+un-marks it as pre-release to ship. See [`docs/messenger/maintenance.md`](docs/messenger/maintenance.md).
 
 ---
 
@@ -81,21 +81,21 @@ through `dispatch…` methods like `dispatchVOOOO(int commandId, …)`.
 *   **Facebook coexistence**: the build strips the two signature-level permissions Messenger
     shares with `com.facebook.katana`, avoiding `INSTALL_FAILED_DUPLICATE_PERMISSION`.
 
-Current command ids are tracked in [`docs/hook-ids.md`](docs/hook-ids.md).
+Current command ids are tracked in [`docs/messenger/hook-ids.md`](docs/messenger/hook-ids.md).
 
 ---
 
 ## 🛠️ Building & maintaining
 
 Full runbook (including how to re-resolve hook ids after a Messenger update): see
-[`docs/maintenance.md`](docs/maintenance.md). In short:
+[`docs/messenger/maintenance.md`](docs/messenger/maintenance.md). In short:
 
 ```bash
 # 1. Build the module
-./gradlew :app:assembleDebug
+./gradlew :messenger:assembleDebug
 # 2. Strip perms + sign + embed into the latest Messenger (downloads it via APKPure)
 bash tools/fetch-messenger.sh download messenger.apk
-bash tools/build-ci.sh messenger.apk app/build/outputs/apk/debug/app-debug.apk dist
+bash tools/build-ci.sh messenger.apk app/build/outputs/apk/debug/messenger-debug.apk dist
 ```
 
 **Prerequisites:** JDK 21 (Android Studio's JBR works — LSPatch needs 21), Android SDK,
@@ -103,7 +103,26 @@ and the pinned jars under `tools/` (`apkeditor`, `uber-apk-signer`, `lspatch`).
 
 **When a feature breaks after an update:** install the build, open the **Debug Console**,
 perform the action (read a message / type), read the new `id`, update the constant in the
-matching `features/*.kt`, and log it in `docs/hook-ids.md`.
+matching `features/*.kt`, and log it in `docs/messenger/hook-ids.md`.
+
+---
+
+## 📘 Also in this repo: Facebook Z
+
+**Facebook Z** applies the same approach to the Facebook app (`com.facebook.katana`), focused on
+stories: hide story views, stop auto-swipe, story download, appear offline, no ads, and
+auto-clearing search history. It ships in the **same release** as Messenger Z (separate
+`FacebookZ-*.apk` file). It is in early development; see [`docs/facebook/maintenance.md`](docs/facebook/maintenance.md).
+
+Repo layout:
+
+| Folder | What |
+|---|---|
+| `app/` | Messenger Z module (Gradle project `:messenger`) |
+| `facebook/` | Facebook Z module |
+| `shared/` | Code both use: settings UI kit, restart/cache tools |
+| `tools/` | Patch pipeline used for both apps |
+| `docs/messenger/`, `docs/facebook/` | Maintenance guides |
 
 ---
 
@@ -111,7 +130,7 @@ matching `features/*.kt`, and log it in `docs/hook-ids.md`.
 
 *   **Creator:** [Hyowon Bernabe](https://github.com/hyowonbernabe)
 *   **Reference/Inspiration:** [MessengerPro by Mino260806](https://github.com/Mino260806/MessengerPro)
-*   **Tools:** [LSPatch](https://github.com/LSPosed/LSPatch), [APKEditor](https://github.com/REAndroid/APKEditor), [uber-apk-signer](https://github.com/patrickfav/uber-apk-signer)
+*   **Tools:** [LSPatch (JingMatrix)](https://github.com/JingMatrix/LSPatch), [DexKit](https://github.com/LuckyPray/DexKit), [APKEditor](https://github.com/REAndroid/APKEditor), [uber-apk-signer](https://github.com/patrickfav/uber-apk-signer)
 
 ---
 

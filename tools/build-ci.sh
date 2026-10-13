@@ -21,7 +21,7 @@ OUT_DIR="${3:?out dir required}"
 PYTHON="${PYTHON:-python3}"
 
 TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORK="${TOOLS_DIR}/work"
+WORK="${WORK:-${TOOLS_DIR}/work}"  # override to build two apps without clobbering each other
 APKEDITOR="${TOOLS_DIR}/apkeditor.jar"
 SIGNER="${TOOLS_DIR}/uber-apk-signer.jar"
 LSPATCH="${TOOLS_DIR}/lspatch/lspatch.jar"
@@ -30,7 +30,8 @@ for j in "$APKEDITOR" "$SIGNER" "$LSPATCH"; do
     [ -f "$j" ] || { echo "missing tool jar: $j" >&2; exit 1; }
 done
 
-# Signature-level permissions Messenger shares with com.facebook.katana (the Facebook app).
+# Signature-level permissions every Meta app declares (Messenger, Facebook, Instagram...).
+# Stripping them lets the re-signed app install next to stock Meta apps (both Messenger Z and Facebook Z use this).
 CONFLICTING_PERMS=(
     "com.facebook.permission.prod.FB_APP_COMMUNICATION"
     "com.facebook.receiver.permission.ACCESS"

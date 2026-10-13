@@ -32,8 +32,8 @@
     Path to the source Messenger APK from APKMirror. Defaults to the only *.apk in repo root.
 
 .PARAMETER ModuleApk
-    Path to the Messenger Z module APK built by ./gradlew :app:assembleDebug.
-    Defaults to app/build/outputs/apk/debug/app-debug.apk.
+    Path to the Messenger Z module APK built by ./gradlew :messenger:assembleDebug.
+    Defaults to app/build/outputs/apk/debug/messenger-debug.apk.
 
 .PARAMETER OutDir
     Directory for the final LSPatched APK. Defaults to <repo>/dist.
@@ -75,7 +75,7 @@ if (-not $MessengerApk) {
     $MessengerApk = $candidates[0].FullName
 }
 if (-not $ModuleApk) {
-    $ModuleApk = Join-Path $RepoRoot "app\build\outputs\apk\debug\app-debug.apk"
+    $ModuleApk = Join-Path $RepoRoot "app\build\outputs\apk\debug\messenger-debug.apk"
 }
 if (-not $OutDir) {
     $OutDir = Join-Path $RepoRoot "dist"

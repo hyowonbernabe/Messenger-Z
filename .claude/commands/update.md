@@ -7,7 +7,7 @@ if a step below says so. Talk to the user in plain language (see global CLAUDE.m
 
 Read `.claude/update.local.md` first (gitignored): it holds the friend chat URL, the chat title
 as shown on the emulator, and the AVD name. If it is missing, ask the user for those values and
-create it. Background: `docs/maintenance.md`, `docs/hook-ids.md`.
+create it. Background: `docs/messenger/maintenance.md`, `docs/messenger/hook-ids.md`.
 
 Paths used below: `ADB=$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`,
 `EMU=$LOCALAPPDATA/Android/Sdk/emulator/emulator.exe`, JDK = `/c/Program Files/Android/Android Studio/jbr`
@@ -20,8 +20,8 @@ Paths used below: `ADB=$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`,
 
 ## 2. Build
 1. `bash tools/fetch-messenger.sh download base/messenger-$V.apk` (`*.apk` is gitignored).
-2. `./gradlew :app:assembleDebug -PmsgrVer=$V` with JAVA_HOME = the JDK above.
-3. `PYTHON=python bash tools/build-ci.sh base/messenger-$V.apk app/build/outputs/apk/debug/app-debug.apk dist`
+2. `./gradlew :messenger:assembleDebug -PmsgrVer=$V` with JAVA_HOME = the JDK above.
+3. `PYTHON=python bash tools/build-ci.sh base/messenger-$V.apk app/build/outputs/apk/debug/messenger-debug.apk dist`
    (JDK `bin` on PATH). Output: `dist/*-lspatched.apk`.
    `tools/lspatch/lspatch.jar` must stay the LSPatch v1.2 + PR #121 build (see maintenance.md §4.1).
 
@@ -78,8 +78,8 @@ Also confirm the Message Logger line `CAPTURED: 'mz seen test …'` appeared in 
    stays blue after closing. Only the user can check a story's viewer list — ask them if in doubt.
 
 ## 6. Record
-1. Add rows for `$V` (with versionCode from `aapt2 dump badging`) to both tables in `docs/hook-ids.md`,
-   and update the §3 table in `docs/maintenance.md`. Update the comments in the feature files.
+1. Add rows for `$V` (with versionCode from `aapt2 dump badging`) to both tables in `docs/messenger/hook-ids.md`,
+   and update the §3 table in `docs/messenger/maintenance.md`. Update the comments in the feature files.
 2. Shut the emulator down: `adb -s emulator-5554 emu kill`.
 
 ## 7. Publish (only if both tests passed)
