@@ -13,8 +13,8 @@ android {
         targetSdk = 36
         // CI overrides versionCode via -PverCode (run-number based) so each build
         // outranks the last and Obtainium/Android can update over it. Local builds use the default.
-        versionCode = (project.findProperty("verCode") as String?)?.toIntOrNull() ?: 11000
-        versionName = "1.10.0"
+        versionCode = (project.findProperty("verCode") as String?)?.toIntOrNull() ?: 11100
+        versionName = "1.11.0"
 
         // Messenger base version this build is patched onto. CI passes -PmsgrVer=<version>;
         // local builds show "dev". Lets the in-app version line auto-track the base.
