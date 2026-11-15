@@ -1,7 +1,6 @@
-### New in 1.12.1
-- Updated to Messenger 587.
-- Rebuilt with the newest LSPatch (the patching tool) for newer Android versions.
-- Facebook Z stays on Facebook 582: Facebook 587 is only available as a 32-bit build, which can't run on current phones.
+### New in 1.12.2
+- Fixes Messenger Z closing right after opening on Android 17 (for example Pixel and Vivo phones that updated).
+- Updated to Messenger 587. Facebook Z stays on Facebook 582 (587 is only available as a 32-bit build).
 
 # Messenger Z
 

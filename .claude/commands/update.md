@@ -24,7 +24,7 @@ Paths used below: `ADB=$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`,
 2. `./gradlew :messenger:assembleDebug -PmsgrVer=$V` with JAVA_HOME = the JDK above.
 3. `PYTHON=python bash tools/build-ci.sh base/messenger-$V.apk app/build/outputs/apk/debug/messenger-debug.apk dist`
    (JDK `bin` on PATH). Output: `dist/*-lspatched.apk`.
-   `tools/lspatch/lspatch.jar` is LSPatch canary 492 (includes PR #121; see maintenance.md §4.1). Used for both apps.
+   `tools/lspatch/lspatch.jar` is LSPatch master rebuilt with Vector c4a701a (Android 17 crash fix; see maintenance.md §4.1). Used for both apps. Do not replace it with a stock build before an official release pins Vector >= c4a701a.
 4. Facebook: `bash tools/fetch-facebook.sh download base/facebook-$FV.apk`,
    `./gradlew :facebook:assembleDebug -PfbVer=$FV`, then
    `WORK=$PWD/tools/work-fb SIGBYPASS=1 PYTHON=python bash tools/build-ci.sh base/facebook-$FV.apk facebook/build/outputs/apk/debug/facebook-debug.apk dist-fb`.

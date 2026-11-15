@@ -122,8 +122,15 @@ so you do not have to decompile by hand.
 > which makes Messenger crash at launch in a different way each time. Only replace the jar
 > with a release that includes #121. It signs with the same key, so updates install over the top.
 >
-> **Update 2026-11-16:** `lspatch.jar` is now JingMatrix canary 492 (includes #121). Both Messenger Z (587) and
-> Facebook Z (582) pass all hook tests with it on the Android 16 emulator. Not yet confirmed on Android 17 / OriginOS 7.
+> **Update 2026-11-16:** `lspatch.jar` is JingMatrix/LSPatch master (canary 492) **rebuilt from source with its `core`
+> submodule moved to Vector `c4a701a`** ("Decode a jfieldID before dereferencing it as an ArtField", 2026-09-02).
+> Stock LSPatch builds up to 492 pin Vector `e00c5c5` (2026-08-22) and **crash at launch on Android 17**
+> (SIGSEGV in `liblspatch.so` `makeFieldWritable`: ART marks the jfieldID with bit 55; seen on a Vivo X300 Ultra and a Pixel).
+> Verified on the Vivo: the patched Messenger stays up. To rebuild: clone LSPatch recursively, `git -C core fetch origin <sha>` +
+> checkout, JDK 21, SDK platform 37 / build-tools 37.0.0 / cmake 3.31 / NDK 29.0.13113456, `ANDROID_HOME` set (also
+> `core/local.properties`), then `./gradlew buildRelease` (jar in `out/release`). On Windows the `-DVERSION_NAME='"..."'`
+> quoting breaks the C++ build: hardcode `kVersionName` in `core/native/include/common/config.h` locally.
+> Drop this custom jar once an official LSPatch release pins Vector >= c4a701a.
 
 ### 4.2 Install and capture the signal
 
