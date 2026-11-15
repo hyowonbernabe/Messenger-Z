@@ -1,3 +1,8 @@
+### New in 1.12.1
+- Updated to Messenger 587.
+- Rebuilt with the newest LSPatch (the patching tool) for newer Android versions.
+- Facebook Z stays on Facebook 582: Facebook 587 is only available as a 32-bit build, which can't run on current phones.
+
 # Messenger Z
 
 Patched Messenger. Non-root: no root, no Xposed install. Updates over any previous Messenger Z

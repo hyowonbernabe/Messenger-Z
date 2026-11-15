@@ -24,13 +24,24 @@ Paths used below: `ADB=$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`,
 2. `./gradlew :messenger:assembleDebug -PmsgrVer=$V` with JAVA_HOME = the JDK above.
 3. `PYTHON=python bash tools/build-ci.sh base/messenger-$V.apk app/build/outputs/apk/debug/messenger-debug.apk dist`
    (JDK `bin` on PATH). Output: `dist/*-lspatched.apk`.
-   `tools/lspatch/lspatch.jar` must stay the LSPatch v1.2 + PR #121 build (see maintenance.md §4.1).
+   `tools/lspatch/lspatch.jar` is LSPatch canary 492 (includes PR #121; see maintenance.md §4.1). Used for both apps.
 4. Facebook: `bash tools/fetch-facebook.sh download base/facebook-$FV.apk`,
    `./gradlew :facebook:assembleDebug -PfbVer=$FV`, then
    `WORK=$PWD/tools/work-fb SIGBYPASS=1 PYTHON=python bash tools/build-ci.sh base/facebook-$FV.apk facebook/build/outputs/apk/debug/facebook-debug.apk dist-fb`.
    `SIGBYPASS=1` is required (level 2 makes Facebook crash/hang at startup).
 
+Check the downloaded Facebook has `lib/arm64-v8a/` (`unzip -l base/facebook-$FV.apk | grep -c lib/arm64`). APKPure served a
+   32-bit-only 587 (installs nowhere modern); if so, keep the last arm64 Facebook and tell the user.
+
 ## 3. Boot the emulator and install
+0. If the AVD from `update.local.md` is missing (it has vanished before), recreate it:
+   `avdmanager create avd -n <avd> -k "system-images;android-36;google_apis;x86_64" -d pixel`
+   (JDK above; `pixel_8` is not a valid device id here), then in `~/.android/avd/<avd>.avd/config.ini` set
+   `hw.gpu.enabled=yes` (avdmanager writes `no`, which crash-loops the graphics) and
+   **`hw.keyboard=yes`** (avdmanager writes `no`, so the user cannot type with their computer keyboard to
+   log in), `hw.ramSize=4096`. Boot with a window (no `-no-window`) so the user can log in. Android 17
+   images (`android-37.0`) crash-loop surfaceflinger on emulator 37.2/37.3 — stay on android-36.
+   A recreated AVD is logged out: ask the user to log in to Messenger (steps below).
 1. Launch with the Bash tool's `run_in_background` (nohup/Start-Process die with the shell):
    `"$EMU" -avd <avd> -port 5554 -no-window -no-boot-anim -gpu host`.
    Wait until `getprop sys.boot_completed` is `1`.
@@ -63,6 +74,10 @@ Paths used below: `ADB=$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`,
    on grey placeholders) and no ad buttons ("Learn more", "Shop now", "Install now") in `uiautomator` dumps.
 
 ## 4. Test No Seen (friend = the user's browser account via claude-in-chrome)
+(A second logged-in account lives in the saved-login Chromium at `C:\Users\hyoar\.mz-test-browser`, started
+with `--remote-debugging-port=9333` and driven over CDP with `playwright-core`; see the memory
+`test-browser-profile`. If the saved chat link says "can't access this chat yet", use that account instead.
+Only send test messages in the chat the user picked.)
 Order matters — the log must contain only the one action:
 1. Open a Chrome tab (claude-in-chrome) at the friend chat URL. Find the message box with `find`
    (window size changes, so never click by stale coordinates).

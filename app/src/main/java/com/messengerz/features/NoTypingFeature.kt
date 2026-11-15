@@ -12,7 +12,7 @@ object NoTypingFeature {
     private const val TAG = "MessengerZ"
 
     // MailboxSDKJNI.dispatchVOOOZ command id for "typing indicator".
-    // Drifts per Messenger version. v82=88, v562=90, v582=96 (found via Debug Console / probe).
+    // Drifts per Messenger version. v82=88, v562=90, v582=96, v587=96 (found via Debug Console / probe).
     private const val TYPING_ID_SDK = 96
 
     fun init(lpparam: XC_LoadPackage.LoadPackageParam) {

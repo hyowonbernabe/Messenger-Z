@@ -12,7 +12,7 @@ object NoSeenFeature {
     private const val TAG = "MessengerZ"
 
     // MailboxSDKJNI.dispatchVOOOOO command id for "mark thread read / send seen".
-    // Meta shuffles this per Messenger version. v82=81, v562=83 (dispatchVOOOO), v582=88 (dispatchVOOOOO, gained an arg).
+    // Meta shuffles this per Messenger version. v82=81, v562=83 (dispatchVOOOO), v582=88 (dispatchVOOOOO, gained an arg), v587=88.
     private const val BLOCK_ID = 88
 
     fun init(lpparam: XC_LoadPackage.LoadPackageParam) {

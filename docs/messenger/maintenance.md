@@ -68,8 +68,8 @@ their timestamp, so messages are keyed by `t<timestamp ms>`. Placeholder detecti
 
 | Feature | File | Hooked target | Version-specific constant | Current value |
 |---|---|---|---|---|
-| No Seen | `features/NoSeenFeature.kt` | `MailboxSDKJNI.dispatchVOOOOO`, arg[0] == id | `BLOCK_ID` | **88** (v582) |
-| No Typing | `features/NoTypingFeature.kt` | `MailboxSDKJNI.dispatchVOOOZ`, arg[0] == id | `TYPING_ID_SDK` | **96** (v582) |
+| No Seen | `features/NoSeenFeature.kt` | `MailboxSDKJNI.dispatchVOOOOO`, arg[0] == id | `BLOCK_ID` | **88** (v582, v587) |
+| No Typing | `features/NoTypingFeature.kt` | `MailboxSDKJNI.dispatchVOOOZ`, arg[0] == id | `TYPING_ID_SDK` | **96** (v582, v587) |
 | No Story Seen | `features/NoStorySeenFeature.kt` | every implementation of the `(MontageCard, boolean)` mark-story-read interface (v582: `KMI` = MSYS, `MSB` = GraphQL `MontageMarkSeenMutation`), found via DexKit | anchor string `MontageMsysMarkReadHandler` | n/a (auto) |
 | Ghost exceptions | `core/GhostChats.kt` + `ui/GhostChatsDialog.kt` | chat token = first non-numeric String arg of the seen/typing dispatch; chat name from header label "`<name>, Thread details`" (MenuInjector); stories match `MontageCard`→`MontageUser` name | English header suffix | n/a |
 | Stop Story Auto-Swipe | `features/StoryControlsFeature.kt` | `MontageProgressIndicatorView` (unobfuscated): after each method, detach its `AnimatorListenerAdapter` (found by type) from its `ValueAnimator` | none | n/a |
@@ -121,6 +121,9 @@ so you do not have to decompile by hand.
 > `AppComponentFactory` (log: `Original AppComponentFactory not found: …M4aAppComponentFactory`),
 > which makes Messenger crash at launch in a different way each time. Only replace the jar
 > with a release that includes #121. It signs with the same key, so updates install over the top.
+>
+> **Update 2026-11-16:** `lspatch.jar` is now JingMatrix canary 492 (includes #121). Both Messenger Z (587) and
+> Facebook Z (582) pass all hook tests with it on the Android 16 emulator. Not yet confirmed on Android 17 / OriginOS 7.
 
 ### 4.2 Install and capture the signal
 

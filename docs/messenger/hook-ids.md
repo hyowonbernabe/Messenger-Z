@@ -18,6 +18,7 @@ verify a value on a new version.
 | 562.0.0.53.83 | 342412030 | 83 | yes | 2026-06-06 | found via Debug Console |
 | 576.0.0.47.92 | 345212743 | ? | **not captured** | 2026-09-01 | shipped with 83 (likely broken); another mod reports 84 for 576, unverified here |
 | 582.0.0.61.92 | 346415776 | 88 | yes | 2026-10-13 | **method changed** to `dispatchVOOOOO` (one more arg). Captured via logcat probe; friend saw "Sent", not "Seen" (E2EE chat) |
+| 587.0.0.54.96 | 347415355 | 88 | yes | 2026-11-16 | unchanged since v582; seen blocked, browser showed "Sent" (E2EE chat) |
 
 ## No Typing — `MailboxSDKJNI.dispatchVOOOZ` (n=5)
 
@@ -27,6 +28,7 @@ verify a value on a new version.
 | 562.0.0.53.83 | 342412030 | 90 | pending | 2026-06-06 | captured as `dispatchVOOOZ id=90`; confirm typing is blocked |
 | 576.0.0.47.92 | 345212743 | ? | **not captured** | 2026-09-01 | shipped with 90 (likely broken); another mod reports 91 for 576, unverified here |
 | 582.0.0.61.92 | 346415776 | 96 | yes | 2026-10-13 | same method; friend saw no typing bubble while blocked (shown when unblocked) |
+| 587.0.0.54.96 | 347415355 | 96 | yes | 2026-11-16 | unchanged since v582; no typing bubble while blocked |
 
 ---
 
