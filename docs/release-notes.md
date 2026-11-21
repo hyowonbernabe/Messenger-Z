@@ -1,3 +1,6 @@
+### New in 1.12.3
+- Each release now lists a SHA-256 checksum for every APK so you can check your download. Some phone scanners falsely flag patched apps (for example `Android:Evo-gen [Trj]`); the app is the real Messenger/Facebook, re-signed, and built from this repo. No feature changes.
+
 ### New in 1.12.2
 - Fixes Messenger Z closing right after opening on Android 17 (for example Pixel and Vivo phones that updated).
 - Updated to Messenger 587. Facebook Z stays on Facebook 582 (587 is only available as a 32-bit build).
