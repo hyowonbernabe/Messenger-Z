@@ -45,6 +45,13 @@ indicators, watch stories anonymously, recover unsent messages) and **installs a
 > Pre-release builds are automated and unverified — a confirmed-working build is published
 > as the latest (non-pre-release) version.
 
+> **Antivirus warning?** Some phone scanners flag Messenger Z / Facebook Z with a generic
+> label like `Android:Evo-gen [Trj]`. This is a false positive: the app is the real
+> Messenger/Facebook, re-signed with our key and with a small loader added, and scanners
+> guess "suspicious" on that pattern. The code is all in this repo, and releases are built
+> from it automatically. Each release's notes list the SHA-256 of every APK and a
+> VirusTotal link, so you can check your download.
+
 ---
 
 ## ⚙️ Usage

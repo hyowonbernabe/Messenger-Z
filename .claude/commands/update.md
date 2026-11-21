@@ -124,6 +124,13 @@ Also confirm the Message Logger line `CAPTURED: 'mz seen test …'` appeared in 
 3. Notes file: one line "Messenger Z + Facebook Z $MODVER (Messenger $V, Facebook $FV),
    verified on an emulator", then `docs/release-notes.md` (it lists **every** feature of both apps —
    keep it current; mark anything new with "(new)"). No pre-release warning.
+   Then append a **Verify your download** section (phone scanners falsely flag patched apps, e.g.
+   `Android:Evo-gen [Trj]`; this is how users can check we're legit):
+   - SHA-256 of each APK: `sha256sum MessengerZ-$V.apk FacebookZ-$FV.apk` (one line each, in a code block).
+   - VirusTotal link for each: `https://www.virustotal.com/gui/file/<sha256>`. The link only works after the file
+     is uploaded, so first upload both APKs: if env `VT_API_KEY` is set, `curl -s -H "x-apikey: $VT_API_KEY" -F file=@<apk> https://www.virustotal.com/api/v3/files`
+     (files over 32 MB need the URL from `GET /api/v3/files/upload_url`). If no key, don't invent links: skip
+     the VirusTotal lines and tell the user to upload the APKs at virustotal.com.
 4. If `v$V` exists (CI makes biweekly pre-releases): `gh release upload v$V MessengerZ-$V.apk FacebookZ-$FV.apk --clobber`,
    `gh release edit v$V --notes-file <notes> --prerelease=false --latest`. Otherwise
    `gh release create v$V MessengerZ-$V.apk FacebookZ-$FV.apk --latest --title "Messenger Z + Facebook Z $MODVER" --notes-file <notes>`.
